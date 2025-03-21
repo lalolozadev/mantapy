@@ -1,6 +1,9 @@
 import webbrowser
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QLineEdit, QLabel
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QLineEdit, QLabel, QHBoxLayout
+from PyQt6.QtCore import Qt
 from .workspace import MantapyUI
+import config.text as text
+import config.button as button
 
 class WelcomeWindow(QWidget):
     def __init__(self):
@@ -9,21 +12,61 @@ class WelcomeWindow(QWidget):
 
     def init_ui(self):
         self.setWindowTitle("Welcome to Mantapy")
-        self.setGeometry(100, 100, 600, 200)
+        
+        # Obtener las dimensiones de la pantalla
+        screen = QApplication.primaryScreen()
+        rect = screen.availableGeometry()
+        
+        # Calcular las coordenadas para centrar la ventana
+        x = (rect.width() - text.w_small[2]) // 2
+        y = (rect.height() - text.w_small[3]) // 2
+        
+        # Establecer la geometría de la ventana (centrada)
+        self.setGeometry(x, y, text.w_small[2], text.w_small[3])
         
         layout = QVBoxLayout()
         
-        self.label_welcome = QLabel("*** Welcome to Mantapy ***\nCreated by: Eduardo Loza\nOpen-source project for oceanographic data analysis.\n\n→ Select an option:")
+        self.label_welcome = QLabel(
+            f"<font size='{text.text_title}'><b> Welcome to Mantapy </b></font><br>"
+            f"<font size='{text.text_normal}'>An open-source project for oceanographic data analysis and more.</font><br>"
+            f"<font size='{text.text_normal}'>Created by: <i>Eduardo Loza</i></font><br><br>"
+            f"<font size='{text.text_normal}'><b> License</b><br>"
+            f"<font size='{text.text_small}'>GNU GENERAL PUBLIC LICENSE<br>"
+            f"<font size='{text.text_small}'>Version 3, 29 June 2007<br>"
+            f"<font size='{text.text_small}'>Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/><br>"
+        )
+
+        # Centrar el texto  
+        self.label_welcome.setAlignment(Qt.AlignmentFlag.AlignCenter)   
         layout.addWidget(self.label_welcome)
+
+        # Layout horizontal para los botones
+        button_layout = QHBoxLayout()
+        # Añadir un padding entre los botones
+        button_layout.setSpacing(button.padding) 
         
         self.btn_start = QPushButton("Start")
+        # Cambiar el tamaño del botón
+        self.btn_start.setFixedSize(button.ini_size[0], button.ini_size[1])  # Ancho 150px, Alto 50px
+        # Aplicar un estilo con bordes redondeados
+        self.btn_start.setStyleSheet(button.start)
         self.btn_start.clicked.connect(self.open_main_window)
-        layout.addWidget(self.btn_start)
+        button_layout.addWidget(self.btn_start)
         
         self.btn_doc = QPushButton("Read Documentation")
+        # Cambiar el tamaño del botón
+        self.btn_doc.setFixedSize(button.ini_size[0], button.ini_size[1])  # Ancho 150px, Alto 50px
+        # Aplicar un estilo con bordes redondeados
+        self.btn_doc.setStyleSheet(button.doc)
         self.btn_doc.clicked.connect(self.open_documentation)
-        layout.addWidget(self.btn_doc)
+        button_layout.addWidget(self.btn_doc)
         
+        # Centrar los botones en el layout horizontal
+        button_layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        # Añadir los botones al layout principal
+        layout.addLayout(button_layout)
+
         self.setLayout(layout)
     
     def open_main_window(self):
