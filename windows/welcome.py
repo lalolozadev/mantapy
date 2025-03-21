@@ -4,6 +4,7 @@ from PyQt6.QtCore import Qt
 from .workspace import MantapyUI
 import config.text as text
 import config.button as button
+import config.window as window
 
 class WelcomeWindow(QWidget):
     def __init__(self):
@@ -18,11 +19,11 @@ class WelcomeWindow(QWidget):
         rect = screen.availableGeometry()
         
         # Calcular las coordenadas para centrar la ventana
-        x = (rect.width() - text.w_small[2]) // 2
-        y = (rect.height() - text.w_small[3]) // 2
+        x = (rect.width() - window.small[2]) // 2
+        y = (rect.height() - window.small[3]) // 2
         
         # Establecer la geometría de la ventana (centrada)
-        self.setGeometry(x, y, text.w_small[2], text.w_small[3])
+        self.setGeometry(x, y, window.small[2], window.small[3])
         
         layout = QVBoxLayout()
         
