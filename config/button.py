@@ -1,8 +1,11 @@
+# Button size
 ini_size = (250, 50)
 
+# Button config
 padding = 15
 border_radius = 5
 
+# Button style
 start = ("QPushButton {"
     "background-color: #4CAF50;"
     "color: white;"
