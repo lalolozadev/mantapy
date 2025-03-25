@@ -1,6 +1,6 @@
-# Font size
-text_title = 8
-text_subtitle = 5
-text_large = 6
-text_normal = 4
-text_small = 3
+# Font size px
+text_title = 20
+text_subtitle = 18
+text_large = 16
+text_normal = 14
+text_small = 12
