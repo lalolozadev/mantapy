@@ -28,13 +28,13 @@ class WelcomeWindow(QWidget):
         layout = QVBoxLayout()
         
         self.label_welcome = QLabel(
-            f"<font size='{text.text_title}'><b> Welcome to Mantapy </b></font><br>"
-            f"<font size='{text.text_normal}'>An open-source project for oceanographic data analysis and more.</font><br>"
-            f"<font size='{text.text_normal}'>Created by: <i>Eduardo Loza</i></font><br><br>"
-            f"<font size='{text.text_normal}'><b> License</b><br>"
-            f"<font size='{text.text_small}'>GNU GENERAL PUBLIC LICENSE<br>"
-            f"<font size='{text.text_small}'>Version 3, 29 June 2007<br>"
-            f"<font size='{text.text_small}'>Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/><br>"
+            f"<span style='font-size:{text.text_title}px;'><b> Welcome to Mantapy </b></span><br>"
+            f"<span style='font-size:{text.text_normal}px;'>An open-source project for oceanographic data analysis and more.</span><br>"
+            f"<span style='font-size:{text.text_normal}px;'>Created by: <i>Eduardo Loza</i></span><br><br>"
+            f"<span style='font-size:{text.text_normal}px;'><b> License</b><br>"
+            f"<span style='font-size:{text.text_small}px;'>GNU GENERAL PUBLIC LICENSE<br>"
+            f"<span style='font-size:{text.text_small}px;'>Version 3, 29 June 2007<br>"
+            f"<span style='font-size:{text.text_small}px;'>Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/></span><br>"
         )
 
         # Centrar el texto  

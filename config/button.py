@@ -1,8 +1,10 @@
-from .text import text_normal
+from .text import (
+    text_large, text_small
+)
 
 # Button size
 ini_size = (250, 50)
-nav_size = (250, 30)
+nav_size = (300, 30)
 
 # Button config
 padding = 5
@@ -21,7 +23,7 @@ gray_pressed = "#2b3137"
 start = ("QPushButton {"
     f"background-color: {green};"
     "color: white;"
-    "font-size: 16px;"
+    f"font-size: {text_large}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
@@ -36,7 +38,7 @@ start = ("QPushButton {"
 doc = ("QPushButton {"
     f"background-color: {gray};"
     "color: white;"
-    "font-size: 16px;"
+    f"font-size: {text_large}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
@@ -51,7 +53,7 @@ doc = ("QPushButton {"
 load_file = ("QPushButton {"
     f"background-color: {green};"
     "color: white;"
-    "font-size: 12px;"
+    f"font-size: {text_small}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
@@ -66,7 +68,7 @@ load_file = ("QPushButton {"
 next = ("QPushButton {"
     f"background-color: {green};"
     "color: white;"
-    "font-size: 12px;"
+    f"font-size: {text_small}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
@@ -81,7 +83,7 @@ next = ("QPushButton {"
 back = doc = ("QPushButton {"
     f"background-color: {gray};"
     "color: white;"
-    "font-size: 12px;"
+    f"font-size: {text_small}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
@@ -90,5 +92,19 @@ back = doc = ("QPushButton {"
     "}"
     "QPushButton:pressed {"
     f"background-color: {gray_pressed};"
+    "}"
+)
+
+file_input = (
+    "QLineEdit {"
+    f"border: 2px solid #ccc;"
+    f"border-radius: {border_radius}px;"
+    f"padding: {padding}px;"
+    f"font-size: {text_small}px;"
+    f"background-color: #f9f9f9;"
+    "}"
+    "QLineEdit:focus {"
+    f"border: 2px solid #0078D7;"
+    f"background-color: #ffffff;"
     "}"
 )

@@ -17,7 +17,7 @@ class MantapyUI(QWidget):
 
         # Barra lateral
         sidebar = QFrame(self)
-        sidebar.setFixedWidth(300)
+        sidebar.setFixedWidth(350)
         sidebar_layout = QVBoxLayout(sidebar)
 
         # StackedWidget para cambiar secciones
