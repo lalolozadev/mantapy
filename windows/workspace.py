@@ -1,9 +1,14 @@
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
     QFileDialog, QLineEdit, QFrame, QStackedWidget, QComboBox, QLabel
+    
 )
 from PyQt6.QtGui import QScreen
+import config.text as text
+from PyQt6.QtCore import Qt
+import pandas as pd
 from .sidebar import LoadFileSection, VariablesSection, PlotSection, ExportSection
+from .content_area import ContentSection
 
 # Clase principal
 class MantapyUI(QWidget):
@@ -38,10 +43,11 @@ class MantapyUI(QWidget):
         sidebar.setLayout(sidebar_layout)
 
         # Área de contenido (derecha)
-        content_area = QFrame(self)
+        self.content_area = ContentSection(text)  # Usa la clase importada
+        
 
         main_layout.addWidget(sidebar)
-        main_layout.addWidget(content_area)
+        main_layout.addWidget(self.content_area)
         self.setLayout(main_layout)
 
         # Maximizar ventana
@@ -50,6 +56,18 @@ class MantapyUI(QWidget):
 
         # Mostrar la primera sección
         self.stacked_widget.setCurrentIndex(0)
+    
+    def update_content_text(self, text, as_notebook=False):
+        """Updates the content area with text or DataFrame.
+        
+        Args:
+            text: Can be either a string or a pandas DataFrame
+            as_notebook (bool): Whether to display as a table
+        """
+        if isinstance(text, pd.DataFrame):
+            self.content_area.update_content_table(text)
+        else:
+            self.content_area.update_content_text(text)
 
     def select_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Select a file")

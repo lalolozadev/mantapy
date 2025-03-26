@@ -1,15 +1,17 @@
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
-                            QPushButton, QLineEdit, QSpacerItem, QSizePolicy
+                            QPushButton, QLineEdit, QSpacerItem, QSizePolicy,
+                            QTableWidget, QTableWidgetItem
                             )
 from PyQt6.QtCore import Qt
 import config.button as button
 import config.text as text
 import os
+import pandas as pd
 
-# Clases de cada sección
 class LoadFileSection(QWidget):
     def __init__(self, parent):
         super().__init__()
+        self.parent = parent  # Guardamos la referencia del padre
         layout = QVBoxLayout(self)
         
         self.title_section = QLabel(
@@ -53,25 +55,82 @@ class LoadFileSection(QWidget):
 
         self.setLayout(layout)
 
+    # def analyze_file_type(self):
+    #     file_path = self.file_path.text().strip()
+
+    #     if not file_path:
+    #         self.parent.update_content_text("No file selected.")
+    #         return
+
+    #     _, file_extension = os.path.splitext(file_path)
+    #     file_extension = file_extension.lower()
+
+    #     if file_extension in ['.csv']:
+    #         try:
+    #             # Read the file with pandas
+    #             df = pd.read_csv(file_path, sep=r'[,\s;|]+', engine='python')
+    #             # Convert DataFrame to HTML table with styling
+    #             html_table = df.to_html(
+    #                 index=False,
+    #                 border=1
+    #             )
+    #             styled_table = html_table.replace('<table', f'<table style="border-collapse: collapse; width: 100%; font-size: {text.text_normal}px; font-family: Arial, sans-serif;"') \
+    #                                     .replace('<th', '<th style="background-color: #4f81bd; color: white; font-weight: bold; border: 1px solid #2f4f6f; padding: 8px;"') \
+    #                                     .replace('<td', '<td style="border: 1px solid #ddd; padding: 8px; text-align: left;"') \
+    #                                     .replace('<tr', '<tr style="border-bottom: 1px solid #ddd;"') \
+    #                                     .replace('<tr style="border-bottom: 1px solid #ddd;"><th', '<tr style="border-bottom: 2px solid #4f81bd;"><th')
+    #             self.parent.update_content_text(styled_table, as_notebook=True)
+    #         except Exception as e:
+    #             self.parent.update_content_text(f"Error reading file: {str(e)}")
+    #         except Exception as e:
+    #             self.parent.update_content_text(f"Error reading file: {str(e)}")
+    #     # elif file_extension in ['.csv']:
+    #     #     message = "The file is a CSV file."
+    #     #    self.parent.update_content_text(message)
+    #     elif file_extension in ['.nc', '.netcdf']:
+    #         message = "The file is a NetCDF file."
+    #         self.parent.update_content_text(message)
+    #     else:
+    #         message = "Unknown file type."
+    #         self.parent.update_content_text(message)
+
     def analyze_file_type(self):
-            file_path = self.file_path.text().strip()  # Obtener el texto y eliminar espacios
+        file_path = self.file_path.text().strip()
 
-            if not file_path:
-                print("No file selected.")
-                return
+        if not file_path:
+            self.parent.update_content_text("No file selected.")
+            return
 
-            _, file_extension = os.path.splitext(file_path)  # Extraer la extensión del archivo
+        _, file_extension = os.path.splitext(file_path)
+        file_extension = file_extension.lower()
 
-            file_extension = file_extension.lower()  # Normalizar la extensión
+        if file_extension in ['.csv', '.txt']:
+            try:
+                # Try to read the file with pandas' automatic delimiter detection
+                df = pd.read_csv(file_path, engine='python', sep=None)
+                
+                # If that fails, try specific delimiters
+                if len(df.columns) == 1:
+                    delimiters = [',', ';', '\t', '|', ' || ', ' | ']
+                    for delimiter in delimiters:
+                        try:
+                            test_df = pd.read_csv(file_path, sep=delimiter, engine='python')
+                            if len(test_df.columns) > 1:
+                                df = test_df
+                                break
+                        except:
+                            continue
 
-            if file_extension in ['.txt']:
-                print("The file is a TXT file.")
-            elif file_extension in ['.csv']:
-                print("The file is a CSV file.")
-            elif file_extension in ['.nc', '.netcdf']:
-                print("The file is a NetCDF file.")
-            else:
-                print("Unknown file type.")
+                self.parent.update_content_text(df)
+                
+            except Exception as e:
+                self.parent.update_content_text(f"Error reading file: {str(e)}")
+        elif file_extension in ['.nc', '.netcdf']:
+            message = "The file is a NetCDF file."
+            self.parent.update_content_text(message)
+        else:
+            message = "Unknown file type."
+            self.parent.update_content_text(message)
 
 class VariablesSection(QWidget):
     def __init__(self, parent):
