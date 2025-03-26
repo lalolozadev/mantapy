@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel,
 from PyQt6.QtCore import Qt
 import config.button as button
 import config.text as text
+import os
 
 # Clases de cada sección
 class LoadFileSection(QWidget):
@@ -37,6 +38,9 @@ class LoadFileSection(QWidget):
         self.file_path.setStyleSheet(button.file_input)
         layout.addWidget(self.file_path)
 
+        # Aquí conectamos el evento para analizar el tipo de archivo automáticamente
+        self.file_path.textChanged.connect(self.analyze_file_type)
+
         # Agregar un espacio entre los elementos superiores y el botón "Next"
         layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
@@ -48,6 +52,26 @@ class LoadFileSection(QWidget):
         layout.addWidget(self.btn_next)
 
         self.setLayout(layout)
+
+    def analyze_file_type(self):
+            file_path = self.file_path.text().strip()  # Obtener el texto y eliminar espacios
+
+            if not file_path:
+                print("No file selected.")
+                return
+
+            _, file_extension = os.path.splitext(file_path)  # Extraer la extensión del archivo
+
+            file_extension = file_extension.lower()  # Normalizar la extensión
+
+            if file_extension in ['.txt']:
+                print("The file is a TXT file.")
+            elif file_extension in ['.csv']:
+                print("The file is a CSV file.")
+            elif file_extension in ['.nc', '.netcdf']:
+                print("The file is a NetCDF file.")
+            else:
+                print("Unknown file type.")
 
 class VariablesSection(QWidget):
     def __init__(self, parent):
