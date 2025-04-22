@@ -6,6 +6,8 @@ class ContentSection(QFrame):
     def __init__(self, text):
         super().__init__()
         self.init_ui(text)
+    
+    #--------------------------------------------
 
     def init_ui(self, text):
         layout = QVBoxLayout(self)
@@ -40,8 +42,9 @@ class ContentSection(QFrame):
         layout.addWidget(self.scroll_area)
         self.setLayout(layout)
 
+    #--------------------------------------------
+
     def update_content_text(self, text):
-        """Actualiza el texto y elimina cualquier tabla anterior."""
         if hasattr(self, "tableWidget"):
             self.container_layout.removeWidget(self.tableWidget)
             self.tableWidget.deleteLater()
@@ -49,9 +52,10 @@ class ContentSection(QFrame):
 
         self.label.setText(f"<span style='font-size:18px; color:#333;'>{text}</span>")
         self.label.show()
+    
+    #--------------------------------------------
 
     def update_content_table(self, df):
-        """Muestra un DataFrame en un QTableWidget dentro del área de contenido."""
         if hasattr(self, "tableWidget"):
             self.container_layout.removeWidget(self.tableWidget)
             self.tableWidget.deleteLater()
