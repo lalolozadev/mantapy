@@ -3,6 +3,8 @@ import config.text as text
 import netCDF4 as nc
 import os
 import pandas as pd
+from utils.file_handlers import read_table_file
+
 
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
@@ -17,10 +19,10 @@ class LoadFileSection(QWidget):
         layout = QVBoxLayout(self)
 
         self.title_section = QLabel(
-            f"<span style='font-size:{text.text_subtitle}px;'><b> Load file </b></span><br>"
-            f"<span style='font-size:{text.text_normal}px;'> Select a file from your device to proceed. </span><br>"
-            f"<span style='font-size:{text.text_normal}px;'> Supported formats include .csv, .txt, and .nc. </span><br><br>"
-            f"<span style='font-size:{text.text_normal}px;'> Click the button below to browse. </span><br>"
+            f"<span style='font-size:{text.text_subtitle}px;'><b> Load Your Data </b></span><br>"
+            f"<span style='font-size:{text.text_normal}px;'>Upload your dataset to kickstart your analysis journey. </span>"
+            f"<span style='font-size:{text.text_normal}px;'>We support popular formats like <b>.csv</b>, <b>.txt</b>, and <b>.nc</b>, making it easy to get started. </span><br><br>"
+            f"<span style='font-size:{text.text_normal}px;'> Click the button below to browse your files. </span><br>"
         )
         self.title_section.setWordWrap(True)
         self.title_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -127,12 +129,7 @@ class LoadFileSection(QWidget):
     def handle_csv_txt(self, file_path):
         try:
             has_headers = self.header_option.currentText() == "Has Headers"
-            df = pd.read_csv(file_path, engine='python', sep=None, header=0 if has_headers else None)
-
-            # Si el archivo no tiene encabezados, asignar nombres genéricos
-            if not has_headers:
-                df.columns = [f"col{i+1}" for i in range(df.shape[1])]
-
+            df = read_table_file(file_path, has_headers=has_headers)
             self.parent.update_content_text(df)
             self.populate_column_selection(df)
         except Exception as e:
@@ -187,31 +184,26 @@ class LoadFileSection(QWidget):
 
 #--------------------------------------------
 
-class VariablesSection(QWidget):
-    def __init__(self, parent):
-        super().__init__()
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("Variables Section"))
-        
-        self.btn_next = QPushButton("Next")
-        self.btn_next.clicked.connect(parent.next_section)
-        self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
-        self.btn_next.setStyleSheet(button.next)
-
-        self.btn_back = QPushButton("Back")
-        self.btn_back.clicked.connect(parent.previous_section)
-        self.btn_back.setFixedSize(button.nav_size[0], button.nav_size[1])
-        self.btn_back.setStyleSheet(button.back)
-
-        layout.addWidget(self.btn_next)
-        layout.addWidget(self.btn_back)
-        self.setLayout(layout)
-
 class PlotSection(QWidget):
     def __init__(self, parent):
         super().__init__()
+        self.parent = parent
         layout = QVBoxLayout(self)
-        layout.addWidget(QLabel("Plot Section"))
+
+        self.title_section = QLabel(
+            f"<span style='font-size:{text.text_subtitle}px;'><b> Make your plot </b></span><br>"
+            f"<span style='font-size:{text.text_normal}px;'>Select your preferred plot type and customize its appearance to best showcase your insights.</span><br>"
+        )
+        self.title_section.setWordWrap(True)
+        self.title_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.title_section)
+
+        # Menú desplegable para elegir si la tabla tiene encabezados o no
+        self.plot_option = QComboBox()
+        self.plot_option.addItems(["Line", "Scatter", "Bar"])
+        self.plot_option.setFixedSize(button.nav_size[0], button.nav_size[1])
+        self.plot_option.currentTextChanged.connect(self.update_plot_preview)
+        layout.addWidget(self.plot_option)
         
         self.btn_back = QPushButton("Back")
         self.btn_back.clicked.connect(parent.previous_section)
@@ -223,9 +215,32 @@ class PlotSection(QWidget):
         self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_next.setStyleSheet(button.next)
 
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         layout.addWidget(self.btn_next)
         layout.addWidget(self.btn_back)
         self.setLayout(layout)
+
+    # def update_plot_preview(self, plot_type):
+    #     """Actualiza la previsualización del gráfico en el área de contenido."""
+    #     self.parent.update_content_plot(plot_type)
+
+    def update_plot_preview(self, plot_type):
+        """Actualiza la previsualización del gráfico en el área de contenido."""
+        # Obtener las columnas seleccionadas de la sección Load File
+        x_column = self.parent.page_load.combo_select1.currentText()
+        y_column = self.parent.page_load.combo_select2.currentText()
+        z_column = self.parent.page_load.combo_select3.currentText()
+
+        # Obtener los datos del DataFrame cargado
+        df = self.parent.loaded_dataframe
+
+        if x_column and y_column:
+            x_data = df[x_column]
+            y_data = df[y_column]
+            z_data = df[z_column] if z_column != "None" else None
+
+            # Actualizar el gráfico en el área de contenido
+            self.parent.update_content_plot(plot_type, x_data, y_data, z_data)
 
 class ExportSection(QWidget):
     def __init__(self, parent):

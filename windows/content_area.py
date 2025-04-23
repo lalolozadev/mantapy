@@ -1,5 +1,7 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QScrollArea, QWidget, QLabel, QTableWidget, QTableWidgetItem
 from PyQt6.QtCore import Qt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
 import config.text as text
 
 class ContentSection(QFrame):
@@ -72,3 +74,69 @@ class ContentSection(QFrame):
 
         self.container_layout.addWidget(self.tableWidget)
         self.label.hide()  # Oculta el texto cuando se muestra la tabla
+
+
+    #--------------------------------------------
+
+    # def update_content_plot(self, plot_type):
+    #     """Renderiza un gráfico en el área de contenido."""
+    #     if hasattr(self, "canvas"):
+    #         self.container_layout.removeWidget(self.canvas)
+    #         self.canvas.deleteLater()
+    #         del self.canvas
+
+    #     # Crear una figura de Matplotlib
+    #     figure = Figure()
+    #     ax = figure.add_subplot(111)
+
+    #     # Generar datos de ejemplo
+    #     x = [1, 2, 3, 4, 5]
+    #     y = [10, 20, 15, 25, 30]
+
+    #     # Seleccionar el tipo de gráfico
+    #     if plot_type == "Line":
+    #         ax.plot(x, y, label="Line Plot")
+    #     elif plot_type == "Scatter":
+    #         ax.scatter(x, y, label="Scatter Plot")
+    #     elif plot_type == "Bar":
+    #         ax.bar(x, y, label="Bar Plot")
+
+    #     ax.set_title(f"{plot_type} Example")
+    #     ax.set_xlabel("X-axis")
+    #     ax.set_ylabel("Y-axis")
+    #     ax.legend()
+
+    #     # Renderizar el gráfico en un canvas de Matplotlib
+    #     self.canvas = FigureCanvas(figure)
+    #     self.container_layout.addWidget(self.canvas)
+    #     self.label.hide()  # Oculta el texto cuando se muestra el gráfico
+
+    def update_content_plot(self, plot_type, x_data, y_data, z_data=None):
+        """Renderiza un gráfico en el área de contenido basado en las columnas seleccionadas."""
+        if hasattr(self, "canvas"):
+            self.container_layout.removeWidget(self.canvas)
+            self.canvas.deleteLater()
+            del self.canvas
+
+        # Crear una figura de Matplotlib
+        figure = Figure()
+        ax = figure.add_subplot(111)
+
+        # Seleccionar el tipo de gráfico
+        if plot_type == "Line":
+            ax.plot(x_data, y_data, label="Line Plot")
+        elif plot_type == "Scatter":
+            ax.scatter(x_data, y_data, label="Scatter Plot")
+        elif plot_type == "Bar":
+            ax.bar(x_data, y_data, label="Bar Plot")
+
+        # Configurar el gráfico
+        ax.set_title(f"{plot_type} Example")
+        ax.set_xlabel("X-axis")
+        ax.set_ylabel("Y-axis")
+        ax.legend()
+
+        # Renderizar el gráfico en un canvas de Matplotlib
+        self.canvas = FigureCanvas(figure)
+        self.container_layout.addWidget(self.canvas)
+        self.label.hide()  # Oculta el texto cuando se muestra el gráfico
