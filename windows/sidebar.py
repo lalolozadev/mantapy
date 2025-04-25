@@ -4,12 +4,11 @@ import netCDF4 as nc
 import os
 import pandas as pd
 from utils.file_handlers import read_table_file
-
-
 from PyQt6.QtCore import Qt
+
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
                             QPushButton, QLineEdit, QSpacerItem, QSizePolicy,
-                            QComboBox
+                            QComboBox, QCheckBox, QScrollArea
                             )
 
 class LoadFileSection(QWidget):
@@ -97,7 +96,7 @@ class LoadFileSection(QWidget):
         self.btn_next.clicked.connect(parent.next_section)
         self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_next.setStyleSheet(button.next)
-        layout.addWidget(self.btn_next)
+        layout.addWidget(self.btn_next)      
 
         self.setLayout(layout)
 
@@ -188,7 +187,37 @@ class PlotSection(QWidget):
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
-        layout = QVBoxLayout(self)
+        
+        # Crear un área de scroll
+        scroll_area = QScrollArea(self)
+        scroll_area.setWidgetResizable(True)
+
+        # Apply a custom stylesheet to remove the border
+        scroll_area.setStyleSheet("""
+            QScrollArea {
+                border: none;  /* Remove the border */
+                background: transparent;  /* Optional: Make the background transparent */
+            }
+            QScrollBar:vertical {
+                width: 10px;  /* Customize the width of the vertical scrollbar */
+                background: #f0f0f0;  /* Background color of the scrollbar */
+                border: none;  /* Remove the border around the scrollbar */
+            }
+            QScrollBar::handle:vertical {
+                background: #c0c0c0;  /* Color of the scrollbar handle */
+                border-radius: 5px;  /* Rounded corners for the scrollbar handle */
+            }
+            QScrollBar::handle:vertical:hover {
+                background: #a0a0a0;  /* Darker color when hovering over the scrollbar handle */
+            }
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+                height: 0px;  /* Remove the up and down arrows */
+            }
+        """)
+
+        # Contenedor para el contenido de la sección
+        content_widget = QWidget()
+        layout = QVBoxLayout(content_widget)
 
         self.title_section = QLabel(
             f"<span style='font-size:{text.text_subtitle}px;'><b> Make your plot </b></span><br>"
@@ -198,12 +227,82 @@ class PlotSection(QWidget):
         self.title_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.title_section)
 
-        # Menú desplegable para elegir si la tabla tiene encabezados o no
+        self.plot_type = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'> Plot type </span>"
+        )
+        self.plot_type.setWordWrap(True)
+        self.plot_type.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.plot_type)
+
         self.plot_option = QComboBox()
         self.plot_option.addItems(["Line", "Scatter", "Bar"])
         self.plot_option.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.plot_option.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.plot_option)
+
+        self.plot_labels = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'><br> Labels </span>"
+        )
+        self.plot_labels.setWordWrap(True)
+        self.plot_labels.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.plot_labels)
+
+        self.checkbox_title = QCheckBox("Set title")
+        self.checkbox_title.stateChanged.connect(self.toggle_title_input)
+        layout.addWidget(self.checkbox_title)
+
+        self.sq_title = QLineEdit()
+        self.sq_title.setPlaceholderText("Type title name")
+        self.sq_title.setFixedSize(button.nav_size[0], button.nav_size[1])
+        self.sq_title.setStyleSheet(button.file_input)
+        self.sq_title.hide()
+        layout.addWidget(self.sq_title)
+
+        # Crear checkbox con texto
+        self.checkbox_xlabel = QCheckBox("Set x label")
+        self.checkbox_xlabel.stateChanged.connect(self.toggle_xlabel_input)
+        layout.addWidget(self.checkbox_xlabel)
+
+        self.sq_xlabel = QLineEdit()
+        self.sq_xlabel.setPlaceholderText("Type x label name")
+        self.sq_xlabel.setFixedSize(button.nav_size[0], button.nav_size[1])
+        self.sq_xlabel.setStyleSheet(button.file_input)
+        self.sq_xlabel.hide()
+        layout.addWidget(self.sq_xlabel)
+
+        self.checkbox_ylabel = QCheckBox("Set y label")
+        self.checkbox_ylabel.stateChanged.connect(self.toggle_ylabel_input)
+        layout.addWidget(self.checkbox_ylabel)
+
+        self.sq_ylabel = QLineEdit()
+        self.sq_ylabel.setPlaceholderText("Type y label name")
+        self.sq_ylabel.setFixedSize(button.nav_size[0], button.nav_size[1])
+        self.sq_ylabel.setStyleSheet(button.file_input)
+        self.sq_ylabel.hide()
+        layout.addWidget(self.sq_ylabel)
+
+        self.style_section = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'><br> Style </span>"
+        )
+        self.style_section.setWordWrap(True)
+        self.style_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.style_section)
+
+        self.checkbox_grid = QCheckBox("Show grid")
+        self.checkbox_grid.setChecked(True)
+        layout.addWidget(self.checkbox_grid)
+
+        self.checkbox_legend = QCheckBox("Show legend")
+        self.checkbox_legend.setChecked(False)
+        layout.addWidget(self.checkbox_legend)
+
+        self.sq_legend = QLineEdit()
+        self.sq_legend.setPlaceholderText("Type legend name")
+        self.sq_legend.setFixedSize(button.nav_size[0], button.nav_size[1])
+        self.sq_legend.setStyleSheet(button.file_input)
+        self.sq_legend.hide()
+        self.checkbox_legend.stateChanged.connect(self.toggle_legend_input)
+        layout.addWidget(self.sq_legend)
         
         self.btn_back = QPushButton("Back")
         self.btn_back.clicked.connect(parent.previous_section)
@@ -218,29 +317,69 @@ class PlotSection(QWidget):
         layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
         layout.addWidget(self.btn_next)
         layout.addWidget(self.btn_back)
-        self.setLayout(layout)
 
-    # def update_plot_preview(self, plot_type):
-    #     """Actualiza la previsualización del gráfico en el área de contenido."""
-    #     self.parent.update_content_plot(plot_type)
+        # Configurar el área de scroll
+        scroll_area.setWidget(content_widget)
+
+        # Layout principal de la sección
+        main_layout = QVBoxLayout(self)
+        main_layout.addWidget(scroll_area)
+        self.setLayout(main_layout)
+    
+    #----------------------------------------
+
+    def toggle_title_input(self, state):
+        """Show or hide the title input based on the checkbox state."""
+        if state == 2:
+            self.sq_title.show()
+        else:
+            self.sq_title.hide()
+
+    def toggle_xlabel_input(self, state):
+        """Show or hide the x label input based on the checkbox state."""
+        if state == 2:
+            self.sq_xlabel.show()
+        else:
+            self.sq_xlabel.hide()
+
+    def toggle_ylabel_input(self, state):
+        """Show or hide the y label input based on the checkbox state."""
+        if state == 2:
+            self.sq_ylabel.show()
+        else:
+            self.sq_ylabel.hide()
+    
+    def toggle_legend_input(self, state):
+        """Show or hide the legend input based on the checkbox state."""
+        if state == 2:
+            self.sq_legend.show()
+        else:
+            self.sq_legend.hide()
+
+        #----------------------------------------
 
     def update_plot_preview(self, plot_type):
-        """Actualiza la previsualización del gráfico en el área de contenido."""
-        # Obtener las columnas seleccionadas de la sección Load File
+        """Updates the plot preview in the content area."""
+        # Get selected columns from the Load File section
         x_column = self.parent.page_load.combo_select1.currentText()
         y_column = self.parent.page_load.combo_select2.currentText()
         z_column = self.parent.page_load.combo_select3.currentText()
 
-        # Obtener los datos del DataFrame cargado
+        # Get the loaded DataFrame
         df = self.parent.loaded_dataframe
 
-        if x_column and y_column:
-            x_data = df[x_column]
-            y_data = df[y_column]
-            z_data = df[z_column] if z_column != "None" else None
+        # Validate that the DataFrame and selected columns exist
+        if df is None or x_column not in df.columns or y_column not in df.columns:
+            self.parent.update_content_text("Please select valid columns and load a dataset.")
+            return
 
-            # Actualizar el gráfico en el área de contenido
-            self.parent.update_content_plot(plot_type, x_data, y_data, z_data)
+        # Extract data for the plot
+        x_data = df[x_column]
+        y_data = df[y_column]
+        z_data = df[z_column] if z_column != "None" else None
+
+        # Update the plot in the content area
+        self.parent.update_content_plot(plot_type, x_data, y_data, z_data)
 
 class ExportSection(QWidget):
     def __init__(self, parent):

@@ -78,51 +78,18 @@ class ContentSection(QFrame):
 
     #--------------------------------------------
 
-    # def update_content_plot(self, plot_type):
-    #     """Renderiza un gráfico en el área de contenido."""
-    #     if hasattr(self, "canvas"):
-    #         self.container_layout.removeWidget(self.canvas)
-    #         self.canvas.deleteLater()
-    #         del self.canvas
-
-    #     # Crear una figura de Matplotlib
-    #     figure = Figure()
-    #     ax = figure.add_subplot(111)
-
-    #     # Generar datos de ejemplo
-    #     x = [1, 2, 3, 4, 5]
-    #     y = [10, 20, 15, 25, 30]
-
-    #     # Seleccionar el tipo de gráfico
-    #     if plot_type == "Line":
-    #         ax.plot(x, y, label="Line Plot")
-    #     elif plot_type == "Scatter":
-    #         ax.scatter(x, y, label="Scatter Plot")
-    #     elif plot_type == "Bar":
-    #         ax.bar(x, y, label="Bar Plot")
-
-    #     ax.set_title(f"{plot_type} Example")
-    #     ax.set_xlabel("X-axis")
-    #     ax.set_ylabel("Y-axis")
-    #     ax.legend()
-
-    #     # Renderizar el gráfico en un canvas de Matplotlib
-    #     self.canvas = FigureCanvas(figure)
-    #     self.container_layout.addWidget(self.canvas)
-    #     self.label.hide()  # Oculta el texto cuando se muestra el gráfico
-
     def update_content_plot(self, plot_type, x_data, y_data, z_data=None):
-        """Renderiza un gráfico en el área de contenido basado en las columnas seleccionadas."""
+        """Renders a plot in the content area based on the selected columns."""
         if hasattr(self, "canvas"):
             self.container_layout.removeWidget(self.canvas)
             self.canvas.deleteLater()
             del self.canvas
 
-        # Crear una figura de Matplotlib
+        # Create a Matplotlib figure
         figure = Figure()
         ax = figure.add_subplot(111)
 
-        # Seleccionar el tipo de gráfico
+        # Generate the plot based on the selected type
         if plot_type == "Line":
             ax.plot(x_data, y_data, label="Line Plot")
         elif plot_type == "Scatter":
@@ -130,13 +97,13 @@ class ContentSection(QFrame):
         elif plot_type == "Bar":
             ax.bar(x_data, y_data, label="Bar Plot")
 
-        # Configurar el gráfico
-        ax.set_title(f"{plot_type} Example")
+        # Configure the plot
+        ax.set_title("Plot Preview")
         ax.set_xlabel("X-axis")
         ax.set_ylabel("Y-axis")
         ax.legend()
 
-        # Renderizar el gráfico en un canvas de Matplotlib
+        # Render the plot in a Matplotlib canvas
         self.canvas = FigureCanvas(figure)
         self.container_layout.addWidget(self.canvas)
-        self.label.hide()  # Oculta el texto cuando se muestra el gráfico
+        self.label.hide()  # Hide the default label when a plot is displayed
