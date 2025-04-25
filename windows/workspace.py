@@ -76,28 +76,28 @@ class MantapyUI(QWidget):
     #--------------------------------------------
 
     def next_section(self):
-        """Avanza a la siguiente sección."""
+        """Advances to the next section."""
         current_index = self.stacked_widget.currentIndex()
         next_index = current_index + 1
 
         if next_index < self.stacked_widget.count():
             self.stacked_widget.setCurrentIndex(next_index)
 
-            # Si la siguiente sección es la de gráficos, renderizar el primer gráfico
+            # If the next section is the PlotSection, render the first plot
             if isinstance(self.stacked_widget.widget(next_index), PlotSection):
                 plot_section = self.stacked_widget.widget(next_index)
-                first_plot_type = plot_section.plot_option.itemText(0)  # Obtener la primera opción
+                first_plot_type = plot_section.plot_option.itemText(0)  # Get the first plot type
 
-                # Obtener las columnas seleccionadas en la sección Load File
+                # Get selected columns from the Load File section
                 x_column = self.page_load.combo_select1.currentText()
                 y_column = self.page_load.combo_select2.currentText()
 
-                # Verificar que las columnas estén seleccionadas y el DataFrame esté cargado
-                if self.loaded_dataframe is not None and x_column and y_column:
+                # Validate that the DataFrame and selected columns exist
+                if self.loaded_dataframe is not None and x_column in self.loaded_dataframe.columns and y_column in self.loaded_dataframe.columns:
                     x_data = self.loaded_dataframe[x_column]
                     y_data = self.loaded_dataframe[y_column]
 
-                    # Renderizar el gráfico
+                    # Render the first plot
                     self.update_content_plot(first_plot_type, x_data, y_data)
 
     #--------------------------------------------
@@ -110,5 +110,5 @@ class MantapyUI(QWidget):
     #--------------------------------------------
 
     def update_content_plot(self, plot_type, x_data, y_data, z_data=None):
-        """Actualiza el área de contenido con un gráfico."""
+        """Updates the content area with a plot."""
         self.content_area.update_content_plot(plot_type, x_data, y_data, z_data)
