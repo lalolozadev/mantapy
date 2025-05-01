@@ -33,7 +33,14 @@ class MantapyUI(QWidget):
         self.page_load = LoadFileSection(self)
         self.stacked_widget.addWidget(self.page_load)
 
-        self.page_plot = PlotSection(self)
+        # Área de contenido (derecha)
+        self.content_area = ContentSection(text)
+        sidebar_layout.addWidget(self.stacked_widget)
+        main_layout.addWidget(sidebar)
+        main_layout.addWidget(self.content_area)
+
+        self.page_plot = PlotSection(self, self.content_area)
+        self.page_plot.restore_plot_settings()
         self.stacked_widget.addWidget(self.page_plot)
 
         self.page_export = ExportSection(self)
@@ -41,12 +48,6 @@ class MantapyUI(QWidget):
 
         sidebar_layout.addWidget(self.stacked_widget)
         sidebar.setLayout(sidebar_layout)
-
-        # Área de contenido (derecha)
-        self.content_area = ContentSection(text)
-        sidebar_layout.addWidget(self.stacked_widget)
-        main_layout.addWidget(sidebar)
-        main_layout.addWidget(self.content_area)
 
         self.setLayout(main_layout)
 
@@ -76,29 +77,29 @@ class MantapyUI(QWidget):
     #--------------------------------------------
 
     def next_section(self):
-        """Advances to the next section."""
         current_index = self.stacked_widget.currentIndex()
         next_index = current_index + 1
 
         if next_index < self.stacked_widget.count():
             self.stacked_widget.setCurrentIndex(next_index)
 
-            # If the next section is the PlotSection, render the first plot
             if isinstance(self.stacked_widget.widget(next_index), PlotSection):
+                self.page_plot.restore_plot_settings()
                 plot_section = self.stacked_widget.widget(next_index)
-                first_plot_type = plot_section.plot_option.itemText(0)  # Get the first plot type
+                first_plot_type = plot_section.plot_option.itemText(0)
 
-                # Get selected columns from the Load File section
                 x_column = self.page_load.combo_select1.currentText()
                 y_column = self.page_load.combo_select2.currentText()
 
-                # Validate that the DataFrame and selected columns exist
                 if self.loaded_dataframe is not None and x_column in self.loaded_dataframe.columns and y_column in self.loaded_dataframe.columns:
                     x_data = self.loaded_dataframe[x_column]
                     y_data = self.loaded_dataframe[y_column]
 
                     # Render the first plot
                     self.update_content_plot(first_plot_type, x_data, y_data)
+
+                    # <-- Aplica la configuración estética guardada
+                    self.page_plot.update_plot_settings()
 
     #--------------------------------------------
 

@@ -184,9 +184,10 @@ class LoadFileSection(QWidget):
 #--------------------------------------------
 
 class PlotSection(QWidget):
-    def __init__(self, parent):
+    def __init__(self, parent, content_area):
         super().__init__()
         self.parent = parent
+        self.content_area = content_area
         
         # Crear un área de scroll
         scroll_area = QScrollArea(self)
@@ -249,35 +250,41 @@ class PlotSection(QWidget):
 
         self.checkbox_title = QCheckBox("Set title")
         self.checkbox_title.stateChanged.connect(self.toggle_title_input)
+        self.checkbox_title.stateChanged.connect(self.update_plot_settings)
         layout.addWidget(self.checkbox_title)
 
         self.sq_title = QLineEdit()
         self.sq_title.setPlaceholderText("Type title name")
         self.sq_title.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_title.setStyleSheet(button.file_input)
+        self.sq_title.textChanged.connect(self.update_plot_settings)
         self.sq_title.hide()
         layout.addWidget(self.sq_title)
 
         # Crear checkbox con texto
         self.checkbox_xlabel = QCheckBox("Set x label")
         self.checkbox_xlabel.stateChanged.connect(self.toggle_xlabel_input)
+        self.checkbox_xlabel.stateChanged.connect(self.update_plot_settings)
         layout.addWidget(self.checkbox_xlabel)
 
         self.sq_xlabel = QLineEdit()
         self.sq_xlabel.setPlaceholderText("Type x label name")
         self.sq_xlabel.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_xlabel.setStyleSheet(button.file_input)
+        self.sq_xlabel.textChanged.connect(self.update_plot_settings)
         self.sq_xlabel.hide()
         layout.addWidget(self.sq_xlabel)
 
         self.checkbox_ylabel = QCheckBox("Set y label")
         self.checkbox_ylabel.stateChanged.connect(self.toggle_ylabel_input)
+        self.checkbox_ylabel.stateChanged.connect(self.update_plot_settings)
         layout.addWidget(self.checkbox_ylabel)
 
         self.sq_ylabel = QLineEdit()
         self.sq_ylabel.setPlaceholderText("Type y label name")
         self.sq_ylabel.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_ylabel.setStyleSheet(button.file_input)
+        self.sq_ylabel.textChanged.connect(self.update_plot_settings)
         self.sq_ylabel.hide()
         layout.addWidget(self.sq_ylabel)
 
@@ -289,17 +296,20 @@ class PlotSection(QWidget):
         layout.addWidget(self.style_section)
 
         self.checkbox_grid = QCheckBox("Show grid")
-        self.checkbox_grid.setChecked(True)
+        self.checkbox_grid.setChecked(False)
+        self.checkbox_grid.stateChanged.connect(self.update_plot_settings)
         layout.addWidget(self.checkbox_grid)
 
         self.checkbox_legend = QCheckBox("Show legend")
         self.checkbox_legend.setChecked(False)
+        self.checkbox_legend.stateChanged.connect(self.update_plot_settings)
         layout.addWidget(self.checkbox_legend)
 
         self.sq_legend = QLineEdit()
         self.sq_legend.setPlaceholderText("Type legend name")
         self.sq_legend.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_legend.setStyleSheet(button.file_input)
+        self.sq_legend.textChanged.connect(self.update_plot_settings)
         self.sq_legend.hide()
         self.checkbox_legend.stateChanged.connect(self.toggle_legend_input)
         layout.addWidget(self.sq_legend)
@@ -325,6 +335,16 @@ class PlotSection(QWidget):
         main_layout = QVBoxLayout(self)
         main_layout.addWidget(scroll_area)
         self.setLayout(main_layout)
+
+        # Estado persistente
+        self.plot_settings = {
+            "title": "",
+            "xlabel": "",
+            "ylabel": "",
+            "grid": False,
+            "legend": False,
+            "legend_text": ""
+        }
     
     #----------------------------------------
 
@@ -378,8 +398,50 @@ class PlotSection(QWidget):
         y_data = df[y_column]
         z_data = df[z_column] if z_column != "None" else None
 
-        # Update the plot in the content area
+        # Actualiza el gráfico
         self.parent.update_content_plot(plot_type, x_data, y_data, z_data)
+
+        # Aplica la configuración guardada
+        self.parent.content_area.update_plot_settings(
+            self.plot_settings["title"],
+            self.plot_settings["xlabel"],
+            self.plot_settings["ylabel"],
+            self.plot_settings["grid"],
+            self.plot_settings["legend"],
+            self.plot_settings["legend_text"]
+        )
+        
+    def update_plot_settings(self):
+        """Send updated plot settings to ContentSection."""
+        self.plot_settings["title"] = self.sq_title.text() if self.checkbox_title.isChecked() else ""
+        self.plot_settings["xlabel"] = self.sq_xlabel.text() if self.checkbox_xlabel.isChecked() else ""
+        self.plot_settings["ylabel"] = self.sq_ylabel.text() if self.checkbox_ylabel.isChecked() else ""
+        self.plot_settings["grid"] = self.checkbox_grid.isChecked()
+        self.plot_settings["legend"] = self.checkbox_legend.isChecked()
+        self.plot_settings["legend_text"] = self.sq_legend.text() if self.checkbox_legend.isChecked() else ""
+
+        self.parent.content_area.update_plot_settings(
+            self.plot_settings["title"],
+            self.plot_settings["xlabel"],
+            self.plot_settings["ylabel"],
+            self.plot_settings["grid"],
+            self.plot_settings["legend"],
+            self.plot_settings["legend_text"]
+        )
+
+    def restore_plot_settings(self):
+        self.checkbox_title.setChecked(bool(self.plot_settings["title"]))
+        self.sq_title.setText(self.plot_settings["title"])
+        self.checkbox_xlabel.setChecked(bool(self.plot_settings["xlabel"]))
+        self.sq_xlabel.setText(self.plot_settings["xlabel"])
+        self.checkbox_ylabel.setChecked(bool(self.plot_settings["ylabel"]))
+        self.sq_ylabel.setText(self.plot_settings["ylabel"])
+        self.checkbox_grid.setChecked(self.plot_settings["grid"])
+        self.checkbox_legend.setChecked(self.plot_settings["legend"])
+        self.sq_legend.setText(self.plot_settings["legend_text"])
+
+        # <-- Añade esta línea para actualizar la figura
+        self.update_plot_settings()
 
 class ExportSection(QWidget):
     def __init__(self, parent):

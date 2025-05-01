@@ -8,6 +8,12 @@ class ContentSection(QFrame):
     def __init__(self, text):
         super().__init__()
         self.init_ui(text)
+
+        self.last_ax = None  # Guarda el último Axes usado
+        self.last_plot_type = None
+        self.last_x_data = None
+        self.last_y_data = None
+        self.last_z_data = None
     
     #--------------------------------------------
 
@@ -89,6 +95,13 @@ class ContentSection(QFrame):
         figure = Figure()
         ax = figure.add_subplot(111)
 
+        # Guarda el último ax y datos
+        self.last_ax = ax
+        self.last_plot_type = plot_type
+        self.last_x_data = x_data
+        self.last_y_data = y_data
+        self.last_z_data = z_data
+
         # Generate the plot based on the selected type
         if plot_type == "Line":
             ax.plot(x_data, y_data, label="Line Plot")
@@ -97,13 +110,42 @@ class ContentSection(QFrame):
         elif plot_type == "Bar":
             ax.bar(x_data, y_data, label="Bar Plot")
 
-        # Configure the plot
-        ax.set_title("Plot Preview")
-        ax.set_xlabel("X-axis")
-        ax.set_ylabel("Y-axis")
+        # Configuración inicial (puedes dejar los textos vacíos)
+        # ax.set_title("")
+        # ax.set_xlabel("")
+        # ax.set_ylabel("")
         ax.legend()
 
         # Render the plot in a Matplotlib canvas
         self.canvas = FigureCanvas(figure)
         self.container_layout.addWidget(self.canvas)
         self.label.hide()  # Hide the default label when a plot is displayed
+
+    def update_plot_settings(self, title, xlabel, ylabel, grid, legend, legend_text):
+        """Update the plot settings based on user input."""
+        if hasattr(self, "canvas") and self.last_ax is not None:
+            figure = self.canvas.figure
+            ax = self.last_ax
+
+            # Actualizar título
+            ax.set_title(title if title else "")
+
+            # Actualizar etiquetas de los ejes
+            ax.set_xlabel(xlabel if xlabel else "")
+            ax.set_ylabel(ylabel if ylabel else "")
+
+            # Activar/desactivar grid
+            ax.grid(grid)
+
+            # Mostrar/ocultar leyenda
+            if legend:
+                if legend_text:
+                    ax.legend([legend_text])
+                else:
+                    ax.legend()
+            else:
+                current_legend = ax.get_legend()
+                if current_legend is not None:
+                    current_legend.remove()
+
+            self.canvas.draw()
