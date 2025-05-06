@@ -5,11 +5,13 @@ import os
 import pandas as pd
 from utils.file_handlers import read_table_file
 from PyQt6.QtCore import Qt
+import matplotlib.colors as mcolors
 
 from PyQt6.QtWidgets import (QWidget, QVBoxLayout, QLabel, 
                             QPushButton, QLineEdit, QSpacerItem, QSizePolicy,
                             QComboBox, QCheckBox, QScrollArea
                             )
+from PyQt6.QtGui import QPixmap, QPainter, QColor, QIcon
 
 class LoadFileSection(QWidget):
     def __init__(self, parent):
@@ -30,14 +32,14 @@ class LoadFileSection(QWidget):
         # Botón Load File
         self.btn_load = QPushButton("Load File")
         self.btn_load.clicked.connect(parent.select_file)
-        self.btn_load.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.btn_load.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_load.setStyleSheet(button.next)
         layout.addWidget(self.btn_load)
 
         # Campo de texto para mostrar la ruta del archivo
         self.file_path = QLineEdit()
         self.file_path.setPlaceholderText("Load a file")
-        self.file_path.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.file_path.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.file_path.setStyleSheet(button.file_input)
         layout.addWidget(self.file_path)
 
@@ -49,7 +51,7 @@ class LoadFileSection(QWidget):
         )
         self.header_option = QComboBox()
         self.header_option.addItems(["Has Headers", "No Headers"])
-        self.header_option.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.header_option.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.header_section.hide()
         self.header_option.hide()
         layout.addWidget(self.header_section)
@@ -94,7 +96,7 @@ class LoadFileSection(QWidget):
         # Botón Next
         self.btn_next = QPushButton("Next")
         self.btn_next.clicked.connect(parent.next_section)
-        self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_next.setStyleSheet(button.next)
         layout.addWidget(self.btn_next)      
 
@@ -237,9 +239,39 @@ class PlotSection(QWidget):
 
         self.plot_option = QComboBox()
         self.plot_option.addItems(["Line", "Scatter", "Bar"])
-        self.plot_option.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.plot_option.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.plot_option.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.plot_option)
+
+        self.color_title = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'><br> Color </span>"
+        )
+        self.color_title.setWordWrap(True)
+        self.color_title.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.color_title)
+
+        self.color_menu = QComboBox()
+        # Obtener colores y nombres
+        color_dict = mcolors.TABLEAU_COLORS
+        for full_name in color_dict:
+            color_name = full_name.replace('tab:', '')
+            color_hex = color_dict[full_name]
+
+            # Crear ícono de color (un círculo o rectángulo)
+            pixmap = QPixmap(20, 20)
+            pixmap.fill(QColor("transparent"))
+
+            painter = QPainter(pixmap)
+            painter.setBrush(QColor(color_hex))
+            painter.setPen(QColor(color_hex))
+            painter.drawEllipse(3, 3, 14, 14)  # dibujar círculo
+            painter.end()
+
+            icon = QIcon(pixmap)
+            self.color_menu.addItem(icon, color_name)
+        #self.color_menu.currentTextChanged.connect(self.update_plot_preview)
+        layout.addWidget(self.color_menu)
+
 
         self.plot_labels = QLabel(
             f"<span style='font-size:{text.text_normal}px;'><br> Labels </span>"
@@ -255,7 +287,7 @@ class PlotSection(QWidget):
 
         self.sq_title = QLineEdit()
         self.sq_title.setPlaceholderText("Type title name")
-        self.sq_title.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.sq_title.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_title.setStyleSheet(button.file_input)
         self.sq_title.textChanged.connect(self.update_plot_settings)
         self.sq_title.hide()
@@ -269,7 +301,7 @@ class PlotSection(QWidget):
 
         self.sq_xlabel = QLineEdit()
         self.sq_xlabel.setPlaceholderText("Type x label name")
-        self.sq_xlabel.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.sq_xlabel.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_xlabel.setStyleSheet(button.file_input)
         self.sq_xlabel.textChanged.connect(self.update_plot_settings)
         self.sq_xlabel.hide()
@@ -282,7 +314,7 @@ class PlotSection(QWidget):
 
         self.sq_ylabel = QLineEdit()
         self.sq_ylabel.setPlaceholderText("Type y label name")
-        self.sq_ylabel.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.sq_ylabel.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_ylabel.setStyleSheet(button.file_input)
         self.sq_ylabel.textChanged.connect(self.update_plot_settings)
         self.sq_ylabel.hide()
@@ -307,21 +339,73 @@ class PlotSection(QWidget):
 
         self.sq_legend = QLineEdit()
         self.sq_legend.setPlaceholderText("Type legend name")
-        self.sq_legend.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.sq_legend.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_legend.setStyleSheet(button.file_input)
         self.sq_legend.textChanged.connect(self.update_plot_settings)
         self.sq_legend.hide()
         self.checkbox_legend.stateChanged.connect(self.toggle_legend_input)
         layout.addWidget(self.sq_legend)
+
+        self.limit_section = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'><br> Limits </span>"
+        )
+        self.limit_section.setWordWrap(True)
+        self.limit_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.limit_section)
+
+        self.checkbox_change_limits = QCheckBox("Set limits")
+        self.checkbox_change_limits.setChecked(False)
+        #self.checkbox_change_limits.stateChanged.connect(self.update_plot_settings)
+        layout.addWidget(self.checkbox_change_limits)
+
+        self.label_xmin = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set x min limit: </span>")
+        self.label_xmin.setWordWrap(True)
+        self.label_xmin.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.label_xmin)
+
+        self.sq_xmin = QLineEdit()
+        self.sq_xmin.setPlaceholderText("Type x min limit")
+        self.sq_xmin.setStyleSheet(button.file_input)
+        layout.addWidget(self.sq_xmin)
+
+        self.label_xmax = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set x max limit: </span>")
+        self.label_xmax.setWordWrap(True)
+        self.label_xmax.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.label_xmax)
+
+        self.sq_xmax = QLineEdit()
+        self.sq_xmax.setPlaceholderText("Type x max limit")
+        self.sq_xmax.setStyleSheet(button.file_input)
+        layout.addWidget(self.sq_xmax)
+
+        self.label_ymin = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set y min limit: </span>")
+        self.label_ymin.setWordWrap(True)
+        self.label_ymin.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.label_ymin)
+
+        self.sq_ymin = QLineEdit()
+        self.sq_ymin.setPlaceholderText("Type y min limit")
+        self.sq_ymin.setStyleSheet(button.file_input)
+        layout.addWidget(self.sq_ymin)
+
+        self.label_ymax = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set y max limit: </span>")
+        self.label_ymax.setWordWrap(True)
+        self.label_ymax.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        layout.addWidget(self.label_ymax)
+
+        self.sq_ymax = QLineEdit()
+        self.sq_ymax.setPlaceholderText("Type y max limit")
+        self.sq_ymax.setStyleSheet(button.file_input)
+        layout.addWidget(self.sq_ymax)
         
         self.btn_back = QPushButton("Back")
         self.btn_back.clicked.connect(parent.previous_section)
-        self.btn_back.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.btn_back.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_back.setStyleSheet(button.back)
         
         self.btn_next = QPushButton("Next")
         self.btn_next.clicked.connect(parent.next_section)
-        self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.btn_next.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_next.setStyleSheet(button.next)
 
         layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
@@ -451,7 +535,7 @@ class ExportSection(QWidget):
         
         self.btn_back = QPushButton("Back")
         self.btn_back.clicked.connect(parent.previous_section)
-        self.btn_back.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.btn_back.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_back.setStyleSheet(button.back)
         
         layout.addWidget(self.btn_back)
