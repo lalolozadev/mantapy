@@ -121,7 +121,8 @@ class ContentSection(QFrame):
         self.container_layout.addWidget(self.canvas)
         self.label.hide()  # Hide the default label when a plot is displayed
 
-    def update_plot_settings(self, title, xlabel, ylabel, grid, legend, legend_text):
+    def update_plot_settings(self, title, xlabel, ylabel, grid, legend, legend_text,
+                            xlim, ylim):
         """Update the plot settings based on user input."""
         if hasattr(self, "canvas") and self.last_ax is not None:
             figure = self.canvas.figure

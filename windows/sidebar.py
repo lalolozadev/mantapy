@@ -230,6 +230,7 @@ class PlotSection(QWidget):
         self.title_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.title_section)
 
+        # Plot type selection
         self.plot_type = QLabel(
             f"<span style='font-size:{text.text_normal}px;'> Plot type </span>"
         )
@@ -243,6 +244,7 @@ class PlotSection(QWidget):
         self.plot_option.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.plot_option)
 
+        # Color selection
         self.color_title = QLabel(
             f"<span style='font-size:{text.text_normal}px;'><br> Color </span>"
         )
@@ -269,10 +271,11 @@ class PlotSection(QWidget):
 
             icon = QIcon(pixmap)
             self.color_menu.addItem(icon, color_name)
-        #self.color_menu.currentTextChanged.connect(self.update_plot_preview)
+        self.color_menu.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.color_menu)
 
 
+        # Plot labels
         self.plot_labels = QLabel(
             f"<span style='font-size:{text.text_normal}px;'><br> Labels </span>"
         )
@@ -314,12 +317,12 @@ class PlotSection(QWidget):
 
         self.sq_ylabel = QLineEdit()
         self.sq_ylabel.setPlaceholderText("Type y label name")
-        #self.sq_ylabel.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.sq_ylabel.setStyleSheet(button.file_input)
         self.sq_ylabel.textChanged.connect(self.update_plot_settings)
         self.sq_ylabel.hide()
         layout.addWidget(self.sq_ylabel)
 
+        # Style options
         self.style_section = QLabel(
             f"<span style='font-size:{text.text_normal}px;'><br> Style </span>"
         )
@@ -346,6 +349,7 @@ class PlotSection(QWidget):
         self.checkbox_legend.stateChanged.connect(self.toggle_legend_input)
         layout.addWidget(self.sq_legend)
 
+        # Limit options
         self.limit_section = QLabel(
             f"<span style='font-size:{text.text_normal}px;'><br> Limits </span>"
         )
@@ -355,52 +359,65 @@ class PlotSection(QWidget):
 
         self.checkbox_change_limits = QCheckBox("Set limits")
         self.checkbox_change_limits.setChecked(False)
-        #self.checkbox_change_limits.stateChanged.connect(self.update_plot_settings)
+        self.checkbox_change_limits.stateChanged.connect(self.toggle_limits_inputs)
+        self.checkbox_change_limits.stateChanged.connect(self.update_plot_settings)
         layout.addWidget(self.checkbox_change_limits)
 
         self.label_xmin = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set x min limit: </span>")
         self.label_xmin.setWordWrap(True)
         self.label_xmin.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.label_xmin.hide()
         layout.addWidget(self.label_xmin)
 
         self.sq_xmin = QLineEdit()
         self.sq_xmin.setPlaceholderText("Type x min limit")
         self.sq_xmin.setStyleSheet(button.file_input)
+        self.sq_xmin.textChanged.connect(self.update_plot_settings)
+        self.sq_xmin.hide()
         layout.addWidget(self.sq_xmin)
 
         self.label_xmax = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set x max limit: </span>")
         self.label_xmax.setWordWrap(True)
         self.label_xmax.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.label_xmax.hide()
         layout.addWidget(self.label_xmax)
 
         self.sq_xmax = QLineEdit()
         self.sq_xmax.setPlaceholderText("Type x max limit")
         self.sq_xmax.setStyleSheet(button.file_input)
+        self.sq_xmax.textChanged.connect(self.update_plot_settings)
+        self.sq_xmax.hide()
         layout.addWidget(self.sq_xmax)
 
         self.label_ymin = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set y min limit: </span>")
         self.label_ymin.setWordWrap(True)
         self.label_ymin.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.label_ymin.hide()
         layout.addWidget(self.label_ymin)
 
         self.sq_ymin = QLineEdit()
         self.sq_ymin.setPlaceholderText("Type y min limit")
         self.sq_ymin.setStyleSheet(button.file_input)
+        self.sq_ymin.textChanged.connect(self.update_plot_settings)
+        self.sq_ymin.hide()
         layout.addWidget(self.sq_ymin)
 
         self.label_ymax = QLabel(f"<span style='font-size:{text.text_normal}px;'> Set y max limit: </span>")
         self.label_ymax.setWordWrap(True)
         self.label_ymax.setAlignment(Qt.AlignmentFlag.AlignLeft)
+        self.label_ymax.hide()
         layout.addWidget(self.label_ymax)
 
         self.sq_ymax = QLineEdit()
         self.sq_ymax.setPlaceholderText("Type y max limit")
         self.sq_ymax.setStyleSheet(button.file_input)
+        self.sq_ymax.textChanged.connect(self.update_plot_settings)
+        self.sq_ymax.hide()
         layout.addWidget(self.sq_ymax)
         
+        # Navigation buttons
         self.btn_back = QPushButton("Back")
         self.btn_back.clicked.connect(parent.previous_section)
-        #self.btn_back.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.btn_back.setStyleSheet(button.back)
         
         self.btn_next = QPushButton("Next")
@@ -427,7 +444,9 @@ class PlotSection(QWidget):
             "ylabel": "",
             "grid": False,
             "legend": False,
-            "legend_text": ""
+            "legend_text": "",
+            "xlim": None,
+            "ylim": None,
         }
     
     #----------------------------------------
@@ -460,24 +479,46 @@ class PlotSection(QWidget):
         else:
             self.sq_legend.hide()
 
+    def toggle_limits_inputs(self, state):
+        enabled = state == 2  # 2 es Checked
+        self.sq_xmin.setEnabled(enabled)
+        self.sq_xmax.setEnabled(enabled)
+        self.sq_ymin.setEnabled(enabled)
+        self.sq_ymax.setEnabled(enabled)
+        # Mostrar u ocultar los text boxes según el estado del checkbox
+        if enabled:
+            self.sq_xmin.show()
+            self.label_xmin.show()
+            self.sq_xmax.show()
+            self.label_xmax.show()
+            self.sq_ymin.show()
+            self.label_ymin.show()
+            self.sq_ymax.show()
+            self.label_ymax.show()
+        else:
+            self.sq_xmin.hide()
+            self.label_xmin.hide()
+            self.sq_xmax.hide()
+            self.label_xmax.hide()
+            self.sq_ymin.hide()
+            self.label_ymin.hide()
+            self.sq_ymax.hide()
+            self.label_ymax.hide()
+
         #----------------------------------------
 
     def update_plot_preview(self, plot_type):
-        """Updates the plot preview in the content area."""
         # Get selected columns from the Load File section
         x_column = self.parent.page_load.combo_select1.currentText()
         y_column = self.parent.page_load.combo_select2.currentText()
         z_column = self.parent.page_load.combo_select3.currentText()
 
-        # Get the loaded DataFrame
         df = self.parent.loaded_dataframe
 
-        # Validate that the DataFrame and selected columns exist
         if df is None or x_column not in df.columns or y_column not in df.columns:
             self.parent.update_content_text("Please select valid columns and load a dataset.")
             return
 
-        # Extract data for the plot
         x_data = df[x_column]
         y_data = df[y_column]
         z_data = df[z_column] if z_column != "None" else None
@@ -492,8 +533,11 @@ class PlotSection(QWidget):
             self.plot_settings["ylabel"],
             self.plot_settings["grid"],
             self.plot_settings["legend"],
-            self.plot_settings["legend_text"]
+            self.plot_settings["legend_text"],
+            self.plot_settings["xlim"],
+            self.plot_settings["ylim"]
         )
+
         
     def update_plot_settings(self):
         """Send updated plot settings to ContentSection."""
@@ -504,13 +548,35 @@ class PlotSection(QWidget):
         self.plot_settings["legend"] = self.checkbox_legend.isChecked()
         self.plot_settings["legend_text"] = self.sq_legend.text() if self.checkbox_legend.isChecked() else ""
 
+        xmin = self.sq_xmin.text().strip()
+        xmax = self.sq_xmax.text().strip()
+        ymin = self.sq_ymin.text().strip()
+        ymax = self.sq_ymax.text().strip()
+
+        if self.checkbox_change_limits.isChecked() and xmin and xmax:
+            try:
+                self.plot_settings["xlim"] = (float(xmin), float(xmax))
+            except ValueError:
+                self.plot_settings["xlim"] = None
+        else:
+            self.plot_settings["xlim"] = None
+
+        if self.checkbox_change_limits.isChecked() and ymin and ymax:
+            try:
+                self.plot_settings["ylim"] = (float(ymin), float(ymax))
+            except ValueError:
+                self.plot_settings["ylim"] = None
+        else:
+            self.plot_settings["ylim"] = None
         self.parent.content_area.update_plot_settings(
             self.plot_settings["title"],
             self.plot_settings["xlabel"],
             self.plot_settings["ylabel"],
             self.plot_settings["grid"],
             self.plot_settings["legend"],
-            self.plot_settings["legend_text"]
+            self.plot_settings["legend_text"],
+            self.plot_settings["xlim"],
+            self.plot_settings["ylim"],
         )
 
     def restore_plot_settings(self):
@@ -523,6 +589,15 @@ class PlotSection(QWidget):
         self.checkbox_grid.setChecked(self.plot_settings["grid"])
         self.checkbox_legend.setChecked(self.plot_settings["legend"])
         self.sq_legend.setText(self.plot_settings["legend_text"])
+        self.sq_xmin.setText(str(self.plot_settings["xlim"][0]) if self.plot_settings["xlim"] else "")
+        self.sq_xmax.setText(str(self.plot_settings["xlim"][1]) if self.plot_settings["xlim"] else "")
+        self.sq_ymin.setText(str(self.plot_settings["ylim"][0]) if self.plot_settings["ylim"] else "")
+        self.sq_ymax.setText(str(self.plot_settings["ylim"][1]) if self.plot_settings["ylim"] else "")
+        self.checkbox_change_limits.setChecked(bool(self.plot_settings["xlim"]) or bool(self.plot_settings["ylim"]))
+        self.sq_xmin.setEnabled(self.checkbox_change_limits.isChecked())
+        self.sq_xmax.setEnabled(self.checkbox_change_limits.isChecked())
+        self.sq_ymin.setEnabled(self.checkbox_change_limits.isChecked())
+        self.sq_ymax.setEnabled(self.checkbox_change_limits.isChecked())
 
         # <-- Añade esta línea para actualizar la figura
         self.update_plot_settings()
