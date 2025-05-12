@@ -1,8 +1,14 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QScrollArea, QWidget, QLabel, QTableWidget, QTableWidgetItem
-from PyQt6.QtCore import Qt
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
+from PyQt6.QtCore import Qt, QUrl, QTimer
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+import plotly.graph_objs as go
+import plotly.io as pio
+import tempfile
+import os
+import numpy as np
 import config.text as text
+import matplotlib.colors as mcolors
+
 
 class ContentSection(QFrame):
     def __init__(self, text):
@@ -82,71 +88,279 @@ class ContentSection(QFrame):
         self.label.hide()  # Oculta el texto cuando se muestra la tabla
 
 
-    #--------------------------------------------
+    def update_content_plot(
+        self,
+        plot_type,
+        x_data,
+        y_data,
+        z_data=None,
+        xlim=None,
+        ylim=None,
+        legend=None,
+        title=None,
+        xlabel=None,
+        ylabel=None,
+        grid=None,
+        legend_text=None,
+        color = None,
+    ):
+                # Reemplazar comas por nada, luego convertir a float
+        x_data = np.array([float(str(x).replace(',', '')) for x in x_data])
+        y_data = np.array([float(str(y).replace(',', '')) for y in y_data])
 
-    def update_content_plot(self, plot_type, x_data, y_data, z_data=None):
-        """Renders a plot in the content area based on the selected columns."""
-        if hasattr(self, "canvas"):
-            self.container_layout.removeWidget(self.canvas)
-            self.canvas.deleteLater()
-            del self.canvas
+        # Eliminar vista previa anterior si existe
+        if hasattr(self, "plot_view") and self.plot_view:
+            self.container_layout.removeWidget(self.plot_view)
+            self.plot_view.deleteLater()
+            self.plot_view = None
 
-        # Create a Matplotlib figure
-        figure = Figure()
-        ax = figure.add_subplot(111)
+        # Solo intenta borrar el archivo temporal si existe
+        if hasattr(self, "temp_file") and self.temp_file and os.path.exists(self.temp_file.name):
+            try:
+                os.remove(self.temp_file.name)
+            except Exception:
+                pass
 
-        # Guarda el último ax y datos
-        self.last_ax = ax
+        # Crear la figura SIEMPRE
+        fig = go.Figure()
+        if plot_type == "Line":
+            fig.add_trace(go.Scatter(
+                x=x_data, 
+                y=y_data, 
+                mode="lines", 
+                name=legend_text or "Line Plot",
+                line=dict(color=color) if color else None  # Añadir color
+            ))
+        elif plot_type == "Scatter":
+            fig.add_trace(go.Scatter(
+                x=x_data, 
+                y=y_data, 
+                mode="markers", 
+                name=legend_text or "Scatter Plot",
+                marker=dict(color=color) if color else None  # Añadir color
+            ))
+        elif plot_type == "Bar":
+            fig.add_trace(go.Bar(
+                x=x_data, 
+                y=y_data, 
+                name=legend_text or "Bar Plot",
+                marker_color=color  # Añadir color
+            ))
+
+        # Guardar el último estado
         self.last_plot_type = plot_type
         self.last_x_data = x_data
         self.last_y_data = y_data
-        self.last_z_data = z_data
+        self.last_legend_text = legend_text
+        self.last_color = color  # Guardar el último color
 
-        # Generate the plot based on the selected type
-        if plot_type == "Line":
-            ax.plot(x_data, y_data, label="Line Plot")
-        elif plot_type == "Scatter":
-            ax.scatter(x_data, y_data, label="Scatter Plot")
-        elif plot_type == "Bar":
-            ax.bar(x_data, y_data, label="Bar Plot")
+        # Update the layout settings to include all parameters
+        fig.update_layout(
+            margin=dict(l=40, r=40, t=40, b=40),
+            showlegend=legend if legend is not None else True,
+            title={"text": title or ""},
+            xaxis={
+                "title": {"text": xlabel or ""},
+                "showgrid": grid if grid is not None else True,
+                "range": xlim
+            },
+            yaxis={
+                "title": {"text": ylabel or ""},
+                "showgrid": grid if grid is not None else True,
+                "range": ylim
+            }
+        )
 
-        # Configuración inicial (puedes dejar los textos vacíos)
-        # ax.set_title("")
-        # ax.set_xlabel("")
-        # ax.set_ylabel("")
-        ax.legend()
+        # Guardar gráfico en archivo temporal
+        self.temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
+        pio.write_html(fig, file=self.temp_file.name, auto_open=False)
 
-        # Render the plot in a Matplotlib canvas
-        self.canvas = FigureCanvas(figure)
-        self.container_layout.addWidget(self.canvas)
-        self.label.hide()  # Hide the default label when a plot is displayed
+        # Mostrar gráfico en QWebEngineView
+        self.plot_view = QWebEngineView()
+        self.plot_view.load(QUrl.fromLocalFile(self.temp_file.name))
+        self.container_layout.addWidget(self.plot_view)
+        self.label.hide()
 
-    def update_plot_settings(self, title, xlabel, ylabel, grid, legend, legend_text,
-                            xlim, ylim):
-        """Update the plot settings based on user input."""
-        if hasattr(self, "canvas") and self.last_ax is not None:
-            figure = self.canvas.figure
-            ax = self.last_ax
+        # Eliminar el archivo temporal después de cargarlo
+        QTimer.singleShot(5000, lambda: os.remove(self.temp_file.name) if os.path.exists(self.temp_file.name) else None)
 
-            # Actualizar título
-            ax.set_title(title if title else "")
+    def update_plot_settings(
+            self,
+            title=None,
+            xlabel=None,
+            ylabel=None,
+            grid=None,
+            legend=None,
+            legend_text=None,
+            xlim=None,
+            ylim=None,
+            color=None
+            ):
+        
+        """Update plot settings without reading from HTML."""
+        if not hasattr(self, "plot_view"):
+            return
+                    
+        # Create a new figure with current data
+        fig = go.Figure()
+        
+        if self.last_plot_type == "Line":
+            fig.add_trace(go.Scatter(
+                x=self.last_x_data, 
+                y=self.last_y_data, 
+                mode="lines", 
+                name=legend_text or self.last_legend_text or "Line Plot",
+                line=dict(color=color) if color else None
+            ))
+        elif self.last_plot_type == "Scatter":
+            fig.add_trace(go.Scatter(
+                x=self.last_x_data, 
+                y=self.last_y_data, 
+                mode="markers", 
+                name=legend_text or self.last_legend_text or "Scatter Plot",
+                marker=dict(color=color) if color else None
+            ))
+        elif self.last_plot_type == "Bar":
+            fig.add_trace(go.Bar(
+                x=self.last_x_data, 
+                y=self.last_y_data, 
+                name=legend_text or self.last_legend_text or "Bar Plot",
+                marker_color=color
+            ))
 
-            # Actualizar etiquetas de los ejes
-            ax.set_xlabel(xlabel if xlabel else "")
-            ax.set_ylabel(ylabel if ylabel else "")
+        # Update layout with new settings
+        layout_updates = {
+            "showlegend": legend if legend is not None else True,
+            "title": {"text": title or "", "font": {"size": text.text_normal or 16}},
+            "xaxis": {
+                "title": {"text": xlabel or "", "font": {"size": text.text_normal or 14}},
+                "showgrid": grid if grid is not None else True,
+                "range": xlim
+            },
+            "yaxis": {
+                "title": {"text": ylabel or "", "font": {"size": text.text_normal or 14}},
+                "showgrid": grid if grid is not None else True,
+                "range": ylim
+            },
+            "margin": dict(l=40, r=40, t=40, b=40)
+        }
 
-            # Activar/desactivar grid
-            ax.grid(grid)
+        # Apply updates
+        fig.update_layout(**layout_updates)
 
-            # Mostrar/ocultar leyenda
-            if legend:
-                if legend_text:
-                    ax.legend([legend_text])
-                else:
-                    ax.legend()
-            else:
-                current_legend = ax.get_legend()
-                if current_legend is not None:
-                    current_legend.remove()
+        # Save and show the updated figure
+        if hasattr(self, "temp_file"):
+            pio.write_html(fig, file=self.temp_file.name, auto_open=False)
+            if self.plot_view:
+                self.plot_view.reload()
 
-            self.canvas.draw()
+        # Actualizar el color
+        selected_color = self.color_menu.currentText()
+        color_dict = mcolors.TABLEAU_COLORS
+        color_hex = color_dict[f'tab:{selected_color}']
+        self.plot_settings["color"] = color_hex
+        
+        # Una sola llamada a update_plot_preview
+        self.update_plot_preview(self.plot_option.currentText())
+
+
+    # def update_content_plot(self, plot_type, x_data, y_data, z_data=None, xlim=None, ylim=None):
+    #     """Renders a plot in the content area based on the selected columns."""
+    #     if hasattr(self, "canvas"):
+    #         self.container_layout.removeWidget(self.canvas)
+    #         self.canvas.deleteLater()
+    #         del self.canvas
+
+    #     x_data = np.array(x_data)
+    #     y_data = np.array(y_data)
+    #     z_data = np.array(z_data) if z_data is not None else None
+
+    #     # Create a Matplotlib figure
+    #     figure = Figure()
+    #     ax = figure.add_subplot(111)
+
+    #     # Guarda el último ax y datos
+    #     self.last_ax = ax
+    #     self.last_plot_type = plot_type
+    #     self.last_x_data = x_data
+    #     self.last_y_data = y_data
+    #     self.last_z_data = z_data
+
+    #     # Generate the plot based on the selected type
+    #     if plot_type == "Line":
+    #         ax.plot(x_data, y_data, label="Line Plot")
+    #     elif plot_type == "Scatter":
+    #         ax.scatter(x_data, y_data, label="Scatter Plot")
+    #     elif plot_type == "Bar":
+    #         ax.bar(x_data, y_data, label="Bar Plot")
+        
+    #     ax.legend()
+
+    #     # --- APLICAR LIMITES AQUÍ ---
+
+    #     # # Limites X
+    #     # if xlim:
+    #     #     ax.set_xlim(xlim)
+    #     # else:
+    #     #     ax.relim()
+    #     #     ax.autoscale_view(scalex=True, scaley=False)
+
+    #     # # Limites Y
+    #     # if ylim:
+    #     #     ax.set_ylim(ylim)
+    #     #     ax.set_autoscale_on(False)  # ← esto es necesario aquí
+    #     # else:
+    #     #     ax.relim()
+    #     #     ax.autoscale_view(scalex=False, scaley=True)
+
+
+    #     # Forzar límites manualmente
+    #     if xlim:
+    #         ax.set_xlim(xlim)
+    #     if ylim:
+    #         ax.set_ylim(ylim)
+
+
+
+
+    #     #self.canvas.draw()
+
+    #     # Render the plot in a Matplotlib canvas
+    #     self.canvas = FigureCanvas(figure)
+    #     self.container_layout.addWidget(self.canvas)
+    #     self.label.hide()  # Hide the default label when a plot is displayed
+
+
+    # def update_plot_settings(self, title, xlabel, ylabel, grid, legend, legend_text, xlim, ylim):
+    #     """Update the plot settings based on user input."""
+    #     if hasattr(self, "canvas") and self.last_ax is not None:
+    #         ax = self.last_ax
+
+    #         # Actualizar título y etiquetas
+    #         ax.set_title(title if title else "")
+    #         ax.set_xlabel(xlabel if xlabel else "")
+    #         ax.set_ylabel(ylabel if ylabel else "")
+
+    #         # Grid
+    #         ax.grid(grid)
+
+    #         # Leyenda
+    #         if legend:
+    #             if legend_text:
+    #                 ax.legend([legend_text])
+    #             else:
+    #                 ax.legend()
+    #         else:
+    #             current_legend = ax.get_legend()
+    #             if current_legend is not None:
+    #                 current_legend.remove()
+
+    #         self.canvas.draw()
+
+    #         # Forzar límites manualmente
+    #         if xlim:
+    #             ax.set_xlim(xlim)
+    #         if ylim:
+    #             ax.set_ylim(ylim)
+
+    #         self.canvas.draw()

@@ -8,4 +8,3 @@ if __name__ == "__main__":
     window = WelcomeWindow()
     window.show()
     sys.exit(app.exec())
-

@@ -170,10 +170,10 @@ class LoadFileSection(QWidget):
         self.variable_section.show()
         self.label_select1.show()
         self.label_select2.show()
-        self.label_select3.show()
+        #self.label_select3.show()
         self.combo_select1.show()
         self.combo_select2.show()
-        self.combo_select3.show()
+        #self.combo_select3.show()
 
     #--------------------------------------------
 
@@ -447,6 +447,7 @@ class PlotSection(QWidget):
             "legend_text": "",
             "xlim": None,
             "ylim": None,
+            "color": None
         }
     
     #----------------------------------------
@@ -523,31 +524,43 @@ class PlotSection(QWidget):
         y_data = df[y_column]
         z_data = df[z_column] if z_column != "None" else None
 
-        # Actualiza el gráfico
-        self.parent.update_content_plot(plot_type, x_data, y_data, z_data)
+        # Obtener el color seleccionado
+        selected_color = self.color_menu.currentText()
+        color_dict = mcolors.TABLEAU_COLORS
+        color_hex = color_dict[f'tab:{selected_color}']
 
-        # Aplica la configuración guardada
-        self.parent.content_area.update_plot_settings(
+        # Una sola llamada con todos los parámetros
+        self.parent.update_content_plot(
+            plot_type,
+            x_data,
+            y_data,
+            z_data,
+            self.plot_settings["xlim"],
+            self.plot_settings["ylim"],
+            self.plot_settings["legend"],
             self.plot_settings["title"],
             self.plot_settings["xlabel"],
             self.plot_settings["ylabel"],
             self.plot_settings["grid"],
-            self.plot_settings["legend"],
             self.plot_settings["legend_text"],
-            self.plot_settings["xlim"],
-            self.plot_settings["ylim"]
+            color_hex
         )
-
         
     def update_plot_settings(self):
         """Send updated plot settings to ContentSection."""
+        # Update title based on checkbox and text
         self.plot_settings["title"] = self.sq_title.text() if self.checkbox_title.isChecked() else ""
+        
+        # Update x and y labels based on checkboxes and text
         self.plot_settings["xlabel"] = self.sq_xlabel.text() if self.checkbox_xlabel.isChecked() else ""
         self.plot_settings["ylabel"] = self.sq_ylabel.text() if self.checkbox_ylabel.isChecked() else ""
+        
+        # Update grid and legend settings
         self.plot_settings["grid"] = self.checkbox_grid.isChecked()
         self.plot_settings["legend"] = self.checkbox_legend.isChecked()
         self.plot_settings["legend_text"] = self.sq_legend.text() if self.checkbox_legend.isChecked() else ""
 
+        # Handle limits
         xmin = self.sq_xmin.text().strip()
         xmax = self.sq_xmax.text().strip()
         ymin = self.sq_ymin.text().strip()
@@ -568,16 +581,15 @@ class PlotSection(QWidget):
                 self.plot_settings["ylim"] = None
         else:
             self.plot_settings["ylim"] = None
-        self.parent.content_area.update_plot_settings(
-            self.plot_settings["title"],
-            self.plot_settings["xlabel"],
-            self.plot_settings["ylabel"],
-            self.plot_settings["grid"],
-            self.plot_settings["legend"],
-            self.plot_settings["legend_text"],
-            self.plot_settings["xlim"],
-            self.plot_settings["ylim"],
-        )
+
+        # Obtener el color seleccionado
+        selected_color = self.color_menu.currentText()
+        color_dict = mcolors.TABLEAU_COLORS
+        color_hex = color_dict[f'tab:{selected_color}']
+        
+        # Update the plot with all settings
+        self.update_plot_preview(self.plot_option.currentText())
+
 
     def restore_plot_settings(self):
         self.checkbox_title.setChecked(bool(self.plot_settings["title"]))

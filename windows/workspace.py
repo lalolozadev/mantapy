@@ -114,6 +114,35 @@ class MantapyUI(QWidget):
 
     #--------------------------------------------
 
-    def update_content_plot(self, plot_type, x_data, y_data, z_data=None):
-        """Updates the content area with a plot."""
-        self.content_area.update_content_plot(plot_type, x_data, y_data, z_data)
+    def update_content_plot(
+        self,
+        plot_type,
+        x_data,
+        y_data,
+        z_data=None,
+        xlim=None,
+        ylim=None,
+        legend=None,
+        title=None,
+        xlabel=None,
+        ylabel=None,
+        grid=None,
+        legend_text=None,
+        color=None
+    ):
+        """Pass all plot settings to content_area"""
+        self.content_area.update_content_plot(
+            plot_type,
+            x_data,
+            y_data,
+            z_data,
+            xlim,
+            ylim,
+            legend,
+            title,
+            xlabel,
+            ylabel,
+            grid,
+            legend_text,
+            color
+        )
