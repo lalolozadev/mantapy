@@ -449,6 +449,13 @@ class PlotSection(QWidget):
             "ylim": None,
             "color": None
         }
+
+        self.color_menu.currentTextChanged.connect(self.on_color_changed)
+
+    def on_color_changed(self, color_name):
+        color_hex = mcolors.TABLEAU_COLORS[f'tab:{color_name}']
+        self.plot_settings["color"] = color_hex
+        self.update_plot_preview(self.plot_option.currentText())
     
     #----------------------------------------
 

@@ -20,6 +20,18 @@ class ContentSection(QFrame):
         self.last_x_data = None
         self.last_y_data = None
         self.last_z_data = None
+
+        self.plot_settings = {
+            "title": "",
+            "xlabel": "",
+            "ylabel": "",
+            "grid": False,
+            "legend": False,
+            "legend_text": "",
+            "xlim": None,
+            "ylim": None,
+            "color": None  # Añadir color a las configuraciones
+        }
     
     #--------------------------------------------
 
@@ -253,15 +265,6 @@ class ContentSection(QFrame):
             pio.write_html(fig, file=self.temp_file.name, auto_open=False)
             if self.plot_view:
                 self.plot_view.reload()
-
-        # Actualizar el color
-        selected_color = self.color_menu.currentText()
-        color_dict = mcolors.TABLEAU_COLORS
-        color_hex = color_dict[f'tab:{selected_color}']
-        self.plot_settings["color"] = color_hex
-        
-        # Una sola llamada a update_plot_preview
-        self.update_plot_preview(self.plot_option.currentText())
 
 
     # def update_content_plot(self, plot_type, x_data, y_data, z_data=None, xlim=None, ylim=None):
