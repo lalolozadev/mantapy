@@ -5,7 +5,9 @@ from PyQt6.QtWidgets import (
 )
 import config.text as text
 import pandas as pd
-from .sidebar import LoadFileSection, PlotSection, ExportSection
+from .sidebar import Sidebar
+from windows.sections.load_section import LoadFileSection
+from windows.sections.plot_section import PlotSection
 from .content_area import ContentSection
 
 # Clase principal
@@ -43,8 +45,8 @@ class MantapyUI(QWidget):
         self.page_plot.restore_plot_settings()
         self.stacked_widget.addWidget(self.page_plot)
 
-        self.page_export = ExportSection(self)
-        self.stacked_widget.addWidget(self.page_export)
+        #self.page_export = ExportSection(self)
+        #self.stacked_widget.addWidget(self.page_export)
 
         sidebar_layout.addWidget(self.stacked_widget)
         sidebar.setLayout(sidebar_layout)
