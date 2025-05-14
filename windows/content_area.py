@@ -208,51 +208,71 @@ class ContentSection(QFrame):
             ylim=None,
             color=None
             ):
-        
         """Update plot settings without reading from HTML."""
         if not hasattr(self, "plot_view"):
             return
                     
+        # Actualizar settings almacenados
+        if title is not None:
+            self.plot_settings["title"] = title
+        if xlabel is not None:
+            self.plot_settings["xlabel"] = xlabel
+        if ylabel is not None:
+            self.plot_settings["ylabel"] = ylabel
+        if grid is not None:
+            self.plot_settings["grid"] = grid
+        if legend is not None:
+            self.plot_settings["legend"] = legend
+        if legend_text is not None:
+            self.plot_settings["legend_text"] = legend_text
+        if xlim is not None:
+            self.plot_settings["xlim"] = xlim
+        if ylim is not None:
+            self.plot_settings["ylim"] = ylim
+        if color is not None:
+            self.plot_settings["color"] = color
+        
         # Create a new figure with current data
         fig = go.Figure()
         
+        # Usar los settings almacenados para crear la figura
         if self.last_plot_type == "Line":
             fig.add_trace(go.Scatter(
                 x=self.last_x_data, 
                 y=self.last_y_data, 
                 mode="lines", 
-                name=legend_text or self.last_legend_text or "Line Plot",
-                line=dict(color=color) if color else None
+                name=self.plot_settings["legend_text"] or "Line Plot",
+                line=dict(color=self.plot_settings["color"]) if self.plot_settings["color"] else None
             ))
         elif self.last_plot_type == "Scatter":
             fig.add_trace(go.Scatter(
                 x=self.last_x_data, 
                 y=self.last_y_data, 
                 mode="markers", 
-                name=legend_text or self.last_legend_text or "Scatter Plot",
-                marker=dict(color=color) if color else None
+                name=self.plot_settings["legend_text"] or "Scatter Plot",
+                marker=dict(color=self.plot_settings["color"]) if self.plot_settings["color"] else None
             ))
         elif self.last_plot_type == "Bar":
             fig.add_trace(go.Bar(
                 x=self.last_x_data, 
                 y=self.last_y_data, 
-                name=legend_text or self.last_legend_text or "Bar Plot",
-                marker_color=color
+                name=self.plot_settings["legend_text"] or "Bar Plot",
+                marker_color=self.plot_settings["color"]
             ))
 
-        # Update layout with new settings
+        # Update layout with settings
         layout_updates = {
-            "showlegend": legend if legend is not None else True,
-            "title": {"text": title or "", "font": {"size": text.text_normal or 16}},
+            "showlegend": self.plot_settings["legend"],
+            "title": {"text": self.plot_settings["title"] or "", "font": {"size": text.text_normal or 16}},
             "xaxis": {
-                "title": {"text": xlabel or "", "font": {"size": text.text_normal or 14}},
-                "showgrid": grid if grid is not None else True,
-                "range": xlim
+                "title": {"text": self.plot_settings["xlabel"] or "", "font": {"size": text.text_normal or 14}},
+                "showgrid": self.plot_settings["grid"],
+                "range": self.plot_settings["xlim"]
             },
             "yaxis": {
-                "title": {"text": ylabel or "", "font": {"size": text.text_normal or 14}},
-                "showgrid": grid if grid is not None else True,
-                "range": ylim
+                "title": {"text": self.plot_settings["ylabel"] or "", "font": {"size": text.text_normal or 14}},
+                "showgrid": self.plot_settings["grid"],
+                "range": self.plot_settings["ylim"]
             },
             "margin": dict(l=40, r=40, t=40, b=40)
         }
