@@ -9,6 +9,8 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, 
     QLineEdit, QSpacerItem, QSizePolicy, QComboBox
 )
+from config.colors import *
+from config.menu_style import menu_style
 
 class LoadFileSection(QWidget):
     def __init__(self, parent):
@@ -48,7 +50,7 @@ class LoadFileSection(QWidget):
         )
         self.header_option = QComboBox()
         self.header_option.addItems(["Has Headers", "No Headers"])
-        #self.header_option.setFixedSize(button.nav_size[0], button.nav_size[1])
+        #self.header_option.setStyleSheet(menu_style)
         self.header_section.hide()
         self.header_option.hide()
         layout.addWidget(self.header_section)

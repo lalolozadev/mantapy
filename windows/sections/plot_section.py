@@ -12,6 +12,10 @@ from .plot_components.plot_labels import PlotLabelsComponent
 from .plot_components.plot_style import PlotStyleComponent
 from .plot_components.plot_limits import PlotLimitsComponent
 
+from config.colors import *
+from config.scroll_style import scroll_style
+from config.menu_style import menu_style
+
 class PlotSection(QWidget):
     def __init__(self, parent, content_area):
         super().__init__()
@@ -23,27 +27,7 @@ class PlotSection(QWidget):
         # Crear un área de scroll
         scroll_area = QScrollArea(self)
         scroll_area.setWidgetResizable(True)
-        scroll_area.setStyleSheet("""
-            QScrollArea {
-                border: none;
-                background: transparent;
-            }
-            QScrollBar:vertical {
-                width: 10px;
-                background: #f0f0f0;
-                border: none;
-            }
-            QScrollBar::handle:vertical {
-                background: #c0c0c0;
-                border-radius: 5px;
-            }
-            QScrollBar::handle:vertical:hover {
-                background: #a0a0a0;
-            }
-            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-                height: 0px;
-            }
-        """)
+        scroll_area.setStyleSheet(scroll_style)
 
         # Contenedor para el contenido de la sección
         content_widget = QWidget()
@@ -103,6 +87,7 @@ class PlotSection(QWidget):
 
         self.plot_option = QComboBox()
         self.plot_option.addItems(["Line", "Scatter", "Bar"])
+        #self.plot_option.setStyleSheet(menu_style)
         self.plot_option.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.plot_option)
 

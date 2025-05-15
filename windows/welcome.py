@@ -1,10 +1,12 @@
 import webbrowser
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QPushButton, QFileDialog, QLineEdit, QLabel, QHBoxLayout
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QPixmap
 from .workspace import MantapyUI
 import config.text as text
 import config.button as button
 import config.window as window
+from config.colors import *
 
 class WelcomeWindow(QWidget):
     def __init__(self):
@@ -13,6 +15,7 @@ class WelcomeWindow(QWidget):
 
     def init_ui(self):
         self.setWindowTitle("Welcome to Mantapy")
+        self.setStyleSheet(f"background-color: {blanco1};")
         
         # Obtener las dimensiones de la pantalla
         screen = QApplication.primaryScreen()
@@ -26,10 +29,26 @@ class WelcomeWindow(QWidget):
         self.setGeometry(x, y, window.small[2], window.small[3])
         
         layout = QVBoxLayout()
-        
+    
+
         self.label_welcome = QLabel(
             f"<span style='font-size:{text.text_title}px;'><b> Welcome to Mantapy </b></span><br>"
-            f"<span style='font-size:{text.text_normal}px;'>An open-source project for oceanographic data analysis and more.</span><br>"
+        )
+
+        # Centrar el texto  
+        self.label_welcome.setAlignment(Qt.AlignmentFlag.AlignCenter)   
+        layout.addWidget(self.label_welcome)
+
+        label = QLabel()
+        pixmap = QPixmap("assets/logo_mantapy.ico")
+        scaled_pixmap = pixmap.scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
+        label.setPixmap(scaled_pixmap)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centrar la imagen en el QLabel
+        layout.addWidget(label, alignment=Qt.AlignmentFlag.AlignCenter)  # Centrar el QLabel en el layout
+
+
+        self.label_welcome = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'>An open-source project for scientific data visualization.</span><br>"
             f"<span style='font-size:{text.text_normal}px;'>Created by: <i>Eduardo Loza</i></span><br><br>"
             f"<span style='font-size:{text.text_normal}px;'><b> License</b><br>"
             f"<span style='font-size:{text.text_small}px;'>GNU GENERAL PUBLIC LICENSE<br>"

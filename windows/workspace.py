@@ -9,6 +9,7 @@ from .sidebar import Sidebar
 from windows.sections.load_section import LoadFileSection
 from windows.sections.plot_section import PlotSection
 from .content_area import ContentSection
+from config.colors import *
 
 # Clase principal
 class MantapyUI(QWidget):
@@ -16,6 +17,8 @@ class MantapyUI(QWidget):
         super().__init__()
         self.loaded_dataframe = None
         self.init_ui()
+        self.setWindowTitle("Workspace - Mantapy")
+        self.setStyleSheet(f"background-color: {blanco1};")
 
     #--------------------------------------------
 

@@ -1,9 +1,10 @@
 from .text import (
-    text_large, text_small
+    text_large, text_small, text_normal
 )
+from .colors import *
 
 # Button size
-ini_size = (250, 50)
+ini_size = (200, 35)
 nav_size = (300, 30)
 
 # Button config
@@ -21,32 +22,32 @@ gray_pressed = "#2b3137"
 
 # Button style
 start = ("QPushButton {"
-    f"background-color: {green};"
+    f"background-color: {verde1};"
     "color: white;"
-    f"font-size: {text_large}px;"
+    f"font-size: {text_normal}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
     "QPushButton:hover {"
-    f"background-color: {green_hover};"
+    f"background-color: {verde2};"
     "}"
     "QPushButton:pressed {"
-    f"background-color: {green_pressed};"
+    f"background-color: {verde1};"
     "}"
 )
 
 doc = ("QPushButton {"
-    f"background-color: {gray};"
+    f"background-color: {azul1};"
     "color: white;"
-    f"font-size: {text_large}px;"
+    f"font-size: {text_normal}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
     "QPushButton:hover {"
-    f"background-color: {gray_hover};"
+    f"background-color: {azul2};"
     "}"
     "QPushButton:pressed {"
-    f"background-color: {gray_pressed};"
+    f"background-color: {azul1};"
     "}"
 )
 
@@ -66,32 +67,32 @@ load_file = ("QPushButton {"
 )
 
 next = ("QPushButton {"
-    f"background-color: {green};"
+    f"background-color: {verde1};"
     "color: white;"
     f"font-size: {text_small}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
     "QPushButton:hover {"
-    f"background-color: {green_hover};"
+    f"background-color: {verde2};"
     "}"
     "QPushButton:pressed {"
-    f"background-color: {green_pressed};"
+    f"background-color: {verde1};"
     "}"
 )
 
-back = doc = ("QPushButton {"
-    f"background-color: {gray};"
+back = ("QPushButton {"
+    f"background-color: {azul1};"
     "color: white;"
     f"font-size: {text_small}px;"
     f"border-radius: {border_radius}px;"
     f"padding: {padding}px;"
     "}"
     "QPushButton:hover {"
-    f"background-color: {gray_hover};"
+    f"background-color: {azul2};"
     "}"
     "QPushButton:pressed {"
-    f"background-color: {gray_pressed};"
+    f"background-color: {azul1};"
     "}"
 )
 
