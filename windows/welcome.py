@@ -48,7 +48,7 @@ class WelcomeWindow(QWidget):
 
 
         self.label_welcome = QLabel(
-            f"<span style='font-size:{text.text_normal}px;'>An open-source project for scientific data visualization.</span><br>"
+            f"<span style='font-size:{text.text_normal}px;'>An open-source project for quick and simple scientific data visualizations.</span><br>"
             f"<span style='font-size:{text.text_normal}px;'>Created by: <i>Eduardo Loza</i></span><br><br>"
             f"<span style='font-size:{text.text_normal}px;'><b> License</b><br>"
             f"<span style='font-size:{text.text_small}px;'>GNU GENERAL PUBLIC LICENSE<br>"

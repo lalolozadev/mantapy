@@ -5,6 +5,7 @@ import os
 import pandas as pd
 from utils.file_handlers import read_table_file
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, 
     QLineEdit, QSpacerItem, QSizePolicy, QComboBox
@@ -32,7 +33,7 @@ class LoadFileSection(QWidget):
         self.btn_load = QPushButton("Load File")
         self.btn_load.clicked.connect(parent.select_file)
         #self.btn_load.setFixedSize(button.nav_size[0], button.nav_size[1])
-        self.btn_load.setStyleSheet(button.next)
+        self.btn_load.setStyleSheet(button.load_file)
         layout.addWidget(self.btn_load)
 
         # Campo de texto para mostrar la ruta del archivo
@@ -50,7 +51,7 @@ class LoadFileSection(QWidget):
         )
         self.header_option = QComboBox()
         self.header_option.addItems(["Has Headers", "No Headers"])
-        #self.header_option.setStyleSheet(menu_style)
+        self.header_option.setFont(text.qfont_small)
         self.header_section.hide()
         self.header_option.hide()
         layout.addWidget(self.header_section)
@@ -74,12 +75,15 @@ class LoadFileSection(QWidget):
         self.label_select3.hide()
 
         self.combo_select1 = QComboBox()
+        self.combo_select1.setFont(text.qfont_small)
         self.combo_select1.hide()
 
         self.combo_select2 = QComboBox()
+        self.combo_select2.setFont(text.qfont_small)
         self.combo_select2.hide()
 
         self.combo_select3 = QComboBox()
+        self.combo_select3.setFont(text.qfont_small)
         self.combo_select3.hide()
 
         layout.addWidget(self.variable_section)

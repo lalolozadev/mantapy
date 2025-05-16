@@ -23,6 +23,7 @@ class PlotLimitsComponent:
 
         # X limits checkbox and inputs
         self.checkbox_change_xlimits = QCheckBox("Change X limits")
+        self.checkbox_change_xlimits.setFont(text.qfont_small)
         self.checkbox_change_xlimits.setChecked(False)
         layout.addWidget(self.checkbox_change_xlimits)
 
@@ -40,6 +41,7 @@ class PlotLimitsComponent:
 
         # Y limits checkbox and inputs
         self.checkbox_change_ylimits = QCheckBox("Change Y limits")
+        self.checkbox_change_ylimits.setFont(text.qfont_small)
         self.checkbox_change_ylimits.setChecked(False)
         layout.addWidget(self.checkbox_change_ylimits)
 

@@ -14,7 +14,6 @@ from .plot_components.plot_limits import PlotLimitsComponent
 
 from config.colors import *
 from config.scroll_style import scroll_style
-from config.menu_style import menu_style
 
 class PlotSection(QWidget):
     def __init__(self, parent, content_area):
@@ -87,7 +86,7 @@ class PlotSection(QWidget):
 
         self.plot_option = QComboBox()
         self.plot_option.addItems(["Line", "Scatter", "Bar"])
-        #self.plot_option.setStyleSheet(menu_style)
+        self.plot_option.setFont(text.qfont_small)
         self.plot_option.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.plot_option)
 
@@ -101,6 +100,7 @@ class PlotSection(QWidget):
         layout.addWidget(self.color_title)
 
         self.color_menu = QComboBox()
+        self.color_menu.setFont(text.qfont_small)
         # Obtener colores y nombres
         color_dict = mcolors.TABLEAU_COLORS
         for full_name in color_dict:

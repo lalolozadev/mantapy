@@ -24,11 +24,13 @@ class PlotStyleComponent:
         # Grid checkbox
         self.checkbox_grid = QCheckBox("Show grid")
         self.checkbox_grid.setChecked(False)
+        self.checkbox_grid.setFont(text.qfont_small)
         layout.addWidget(self.checkbox_grid)
 
         # Legend checkbox and input
         self.checkbox_legend = QCheckBox("Show legend")
         self.checkbox_legend.setChecked(False)
+        self.checkbox_legend.setFont(text.qfont_small)
         layout.addWidget(self.checkbox_legend)
 
         self.sq_legend = QLineEdit()

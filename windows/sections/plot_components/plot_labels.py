@@ -24,6 +24,7 @@ class PlotLabelsComponent:
         # Title checkbox and input
         self.checkbox_title = QCheckBox("Show title")
         self.checkbox_title.setChecked(False)
+        self.checkbox_title.setFont(text.qfont_small)
         layout.addWidget(self.checkbox_title)
 
         self.sq_title = QLineEdit()
@@ -34,6 +35,7 @@ class PlotLabelsComponent:
 
         # X Label checkbox and input
         self.checkbox_xlabel = QCheckBox("Show X label")
+        self.checkbox_xlabel.setFont(text.qfont_small)
         self.checkbox_xlabel.setChecked(False)
         layout.addWidget(self.checkbox_xlabel)
 
@@ -45,6 +47,7 @@ class PlotLabelsComponent:
 
         # Y Label checkbox and input
         self.checkbox_ylabel = QCheckBox("Show Y label")
+        self.checkbox_ylabel.setFont(text.qfont_small)
         self.checkbox_ylabel.setChecked(False)
         layout.addWidget(self.checkbox_ylabel)
 
