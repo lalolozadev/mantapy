@@ -7,7 +7,7 @@ This document outlines the planned development path for Mantapy, highlighting ke
 ---
 
 ## 🔹 Version 0.1 – *"Foundations of Simplicity"*  
-**Estimated Release:** Early June 2025
+**Estimated Release:** Early August 2025
 
 This is the first public release of Mantapy.
 
