@@ -7,7 +7,9 @@ import tempfile
 import os
 import numpy as np
 import config.text as text
-import matplotlib.colors as mcolors
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
 
 
 class ContentSection(QFrame):
@@ -99,6 +101,7 @@ class ContentSection(QFrame):
         self.container_layout.addWidget(self.tableWidget)
         self.label.hide()  # Oculta el texto cuando se muestra la tabla
 
+    #--------------------------------------------
 
     def update_content_plot(
         self,
@@ -115,6 +118,8 @@ class ContentSection(QFrame):
         grid=None,
         legend_text=None,
         color = None,
+        enable_regression=False,
+        regression_type=None,
     ):
                 # Reemplazar comas por nada, luego convertir a float
         x_data = np.array([float(str(x).replace(',', '')) for x in x_data])
@@ -158,6 +163,10 @@ class ContentSection(QFrame):
                 name=legend_text or "Bar Plot",
                 marker_color=color  # Añadir color
             ))
+        
+        # ... después de crear fig y agregar los datos principales ...
+        if enable_regression and regression_type:
+            self.add_regression_to_plot(fig, x_data, y_data, regression_type)
 
         # Guardar el último estado
         self.last_plot_type = plot_type
@@ -196,6 +205,8 @@ class ContentSection(QFrame):
         # Eliminar el archivo temporal después de cargarlo
         QTimer.singleShot(5000, lambda: os.remove(self.temp_file.name) if os.path.exists(self.temp_file.name) else None)
 
+    #--------------------------------------------
+
     def update_plot_settings(
             self,
             title=None,
@@ -206,7 +217,9 @@ class ContentSection(QFrame):
             legend_text=None,
             xlim=None,
             ylim=None,
-            color=None
+            color=None,
+            enable_regression=False,
+            regression_type=None,
             ):
         """Update plot settings without reading from HTML."""
         if not hasattr(self, "plot_view"):
@@ -259,6 +272,9 @@ class ContentSection(QFrame):
                 name=self.plot_settings["legend_text"] or "Bar Plot",
                 marker_color=self.plot_settings["color"]
             ))
+        
+        if enable_regression and regression_type:
+            self.add_regression_to_plot(fig, self.last_x_data, self.last_y_data, regression_type)
 
         # Update layout with settings
         layout_updates = {
@@ -285,3 +301,37 @@ class ContentSection(QFrame):
             pio.write_html(fig, file=self.temp_file.name, auto_open=False)
             if self.plot_view:
                 self.plot_view.reload()
+
+    #--------------------------------------------
+
+    def add_regression_to_plot(self, fig, x_data, y_data, regression_type):
+        """
+        Añade una curva de regresión al gráfico plotly.
+        regression_type: 'linear', 'poly2', 'poly3'
+        """
+        x = np.array(x_data).reshape(-1, 1)
+        y = np.array(y_data)
+
+        if regression_type == "linear":
+            model = LinearRegression()
+            model.fit(x, y)
+            y_pred = model.predict(x)
+            fig.add_trace(go.Scatter(
+                x=x_data, y=y_pred,
+                mode="lines",
+                name="Linear Regression",
+                line=dict(dash="dash", color="red")
+            ))
+        elif regression_type in ["poly2", "poly3"]:
+            degree = 2 if regression_type == "poly2" else 3
+            poly = PolynomialFeatures(degree)
+            x_poly = poly.fit_transform(x)
+            model = LinearRegression()
+            model.fit(x_poly, y)
+            y_pred = model.predict(x_poly)
+            fig.add_trace(go.Scatter(
+                x=x_data, y=y_pred,
+                mode="lines",
+                name=f"Poly {degree} Regression",
+                line=dict(dash="dot", color="green" if degree == 2 else "blue")
+            ))

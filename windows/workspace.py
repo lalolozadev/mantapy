@@ -133,8 +133,11 @@ class MantapyUI(QWidget):
         ylabel=None,
         grid=None,
         legend_text=None,
-        color=None
+        color=None,
+        enable_regression=False,      # <--- agrega esto
+        regression_type=None          # <--- y esto
     ):
+        
         """Pass all plot settings to content_area"""
         self.content_area.update_content_plot(
             plot_type,
@@ -149,5 +152,7 @@ class MantapyUI(QWidget):
             ylabel,
             grid,
             legend_text,
-            color
+            color,
+            enable_regression,         # <--- y pásalos aquí
+            regression_type
         )

@@ -11,6 +11,7 @@ from PyQt6.QtGui import QPixmap, QPainter, QColor, QIcon
 from .plot_components.plot_labels import PlotLabelsComponent
 from .plot_components.plot_style import PlotStyleComponent
 from .plot_components.plot_limits import PlotLimitsComponent
+from .plot_components.plot_regression import PlotRegressionComponent
 
 from config.colors import *
 from config.scroll_style import scroll_style
@@ -51,6 +52,7 @@ class PlotSection(QWidget):
         self.labels_component = PlotLabelsComponent(self, layout)
         self.style_component = PlotStyleComponent(self, layout)
         self.limits_component = PlotLimitsComponent(self,layout)
+        self.regression_component = PlotRegressionComponent(self, layout)
 
         # Navigation buttons
         self.setup_navigation_buttons(layout)
@@ -159,7 +161,7 @@ class PlotSection(QWidget):
         style_settings = self.style_component.get_style_settings()
         limit_settings = self.limits_component.get_limit_settings()
 
-        # Update plot with all settings
+        # ...existing code...
         self.parent.update_content_plot(
             plot_type,
             df[x_column],
@@ -173,8 +175,29 @@ class PlotSection(QWidget):
             label_settings["ylabel"],
             style_settings["grid"],
             style_settings["legend_text"],
-            self.plot_settings["color"]  # Usar el color guardado en plot_settings
+            self.plot_settings["color"],  # color
+            self.regression_component.checkbox_enable_regression.isChecked(),  # enable_regression
+            self.regression_component.sq_regression_type.text().strip()        # regression_type
         )
+
+        # # Update plot with all settings
+        # self.parent.update_content_plot(
+        #     plot_type,
+        #     df[x_column],
+        #     df[y_column],
+        #     df[z_column] if z_column != "None" else None,
+        #     limit_settings["xlim"],
+        #     limit_settings["ylim"],
+        #     style_settings["legend"],
+        #     label_settings["title"],
+        #     label_settings["xlabel"],
+        #     label_settings["ylabel"],
+        #     style_settings["grid"],
+        #     style_settings["legend_text"],
+        #     self.plot_settings["color"]  # Usar el color guardado en plot_settings
+        #     self.regression_component.checkbox_enable_regression.isChecked(),  # enable_regression
+        #     self.regression_component.sq_regression_type.text().strip()        # regression_type
+        # )
 
     def restore_plot_settings(self):
         self.labels_component.restore_settings(self.plot_settings)
