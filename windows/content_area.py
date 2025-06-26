@@ -193,6 +193,7 @@ class ContentSection(QFrame):
         )
 
         # Guardar gráfico en archivo temporal
+        self.current_figure = fig
         self.temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".html")
         pio.write_html(fig, file=self.temp_file.name, auto_open=False)
 

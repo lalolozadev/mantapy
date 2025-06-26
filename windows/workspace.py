@@ -1,13 +1,17 @@
+from PyQt6.QtCore import Qt
+from PyQt6.QtCore import QThread, pyqtSignal, QObject
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout,
-    QFileDialog, QFrame, QStackedWidget
-    
+    QFileDialog, QFrame, QStackedWidget,
+    QProgressDialog, QApplication, QMessageBox
 )
 import config.text as text
 import pandas as pd
+import os
 from .sidebar import Sidebar
 from windows.sections.load_section import LoadFileSection
 from windows.sections.plot_section import PlotSection
+from windows.sections.export_section import ExportPlotSection, ExportWorker
 from .content_area import ContentSection
 from config.colors import *
 
@@ -48,8 +52,8 @@ class MantapyUI(QWidget):
         self.page_plot.restore_plot_settings()
         self.stacked_widget.addWidget(self.page_plot)
 
-        #self.page_export = ExportSection(self)
-        #self.stacked_widget.addWidget(self.page_export)
+        self.export_plot = ExportPlotSection(self)
+        self.stacked_widget.addWidget(self.export_plot)
 
         sidebar_layout.addWidget(self.stacked_widget)
         sidebar.setLayout(sidebar_layout)
@@ -156,3 +160,44 @@ class MantapyUI(QWidget):
             enable_regression,         # <--- y pásalos aquí
             regression_type
         )
+    #--------------------------------------------
+
+    def export_plot(self):
+        fig = getattr(self.content_area, "current_figure", None)
+        if fig is None:
+            print("No plot to export.")
+            return
+
+        file_name = self.export_plot.file_name.text().strip()
+        export_format = self.export_plot.format_option.currentText().lower()
+
+        if not file_name:
+            print("Please enter a file name.")
+            return
+
+        dir_path = self.export_plot.dir_path.text().strip()
+        file_name = self.export_plot.file_name.text().strip() + f".{export_format}"
+        if dir_path and file_name:
+            full_path = os.path.join(dir_path, file_name)
+        else:
+            full_path = file_name
+
+        # Barra de progreso modal sobre la ventana principal
+        self.progress = QProgressDialog("Exporting plot...", None, 0, 0, self)
+        self.progress.setWindowTitle("Please wait")
+        self.progress.setWindowModality(Qt.WindowModality.ApplicationModal)
+        self.progress.setMinimumDuration(0)
+        self.progress.show()
+
+        # Crear y lanzar el worker en un hilo
+        self.export_thread = QThread()
+        self.export_worker = ExportWorker(fig, full_path, export_format)
+        self.export_worker.moveToThread(self.export_thread)
+        self.export_thread.started.connect(self.export_worker.run)
+        self.export_worker.finished.connect(self.export_thread.quit)
+        self.export_worker.finished.connect(self.progress.close)
+        self.export_worker.finished.connect(lambda: print(f"Plot exported as {full_path}"))
+        self.export_worker.error.connect(self.export_thread.quit)
+        self.export_worker.error.connect(self.progress.close)
+        self.export_worker.error.connect(lambda msg: print(f"Error exporting plot: {msg}"))
+        self.export_thread.start()

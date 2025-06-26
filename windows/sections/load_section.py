@@ -11,7 +11,6 @@ from PyQt6.QtWidgets import (
     QLineEdit, QSpacerItem, QSizePolicy, QComboBox
 )
 from config.colors import *
-from config.menu_style import menu_style
 
 class LoadFileSection(QWidget):
     def __init__(self, parent):
