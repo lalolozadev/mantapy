@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit
+from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit, QComboBox
 from PyQt6.QtCore import Qt
 import config.text as text
 import config.button as button
@@ -27,10 +27,17 @@ class PlotRegressionComponent:
         self.checkbox_enable_regression.setChecked(False)
         layout.addWidget(self.checkbox_enable_regression)
 
-        # Regression type input
-        self.sq_regression_type = QLineEdit()
-        self.sq_regression_type.setPlaceholderText("Regression Type (e.g., linear, polynomial)")
-        self.sq_regression_type.setStyleSheet(button.file_input)
+        # # Regression type input
+        # self.sq_regression_type = QLineEdit()
+        # self.sq_regression_type.setPlaceholderText("Regression Type (e.g., linear, polynomial)")
+        # self.sq_regression_type.setStyleSheet(button.file_input)
+        # self.sq_regression_type.hide()
+        # layout.addWidget(self.sq_regression_type)
+
+        # Regression type menu
+        self.sq_regression_type = QComboBox()
+        self.sq_regression_type.addItems(['linear', 'poly2', 'poly3'])
+        self.sq_regression_type.setFont(text.qfont_small)
         self.sq_regression_type.hide()
         layout.addWidget(self.sq_regression_type)
 
@@ -39,7 +46,7 @@ class PlotRegressionComponent:
         self.checkbox_enable_regression.stateChanged.connect(self.toggle_regression_inputs)
         # Notificar cambio de regresión
         self.checkbox_enable_regression.stateChanged.connect(self.notify_change)
-        self.sq_regression_type.textChanged.connect(self.notify_change)
+        self.sq_regression_type.currentTextChanged.connect(self.notify_change)
     
     def notify_change(self):
         if self.plot_section:
@@ -47,3 +54,4 @@ class PlotRegressionComponent:
     def toggle_regression_inputs(self):
         is_checked = self.checkbox_enable_regression.isChecked()
         self.sq_regression_type.setVisible(is_checked)
+        self.plot_section.regression_type = self.sq_regression_type.currentText()

@@ -177,7 +177,7 @@ class PlotSection(QWidget):
             style_settings["legend_text"],
             self.plot_settings["color"],  # color
             self.regression_component.checkbox_enable_regression.isChecked(),  # enable_regression
-            self.regression_component.sq_regression_type.text().strip()        # regression_type
+            self.regression_component.sq_regression_type.currentText()     # regression_type
         )
 
     def restore_plot_settings(self):
