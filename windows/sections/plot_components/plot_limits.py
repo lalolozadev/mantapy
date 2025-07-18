@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit
+from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit, QPushButton, QHBoxLayout
 from PyQt6.QtCore import Qt
 import config.text as text
 import config.button as button
@@ -21,11 +21,30 @@ class PlotLimitsComponent:
         self.limits_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.limits_section)
 
-        # X limits checkbox and inputs
-        self.checkbox_change_xlimits = QCheckBox("Change X limits")
-        self.checkbox_change_xlimits.setFont(text.qfont_small)
-        self.checkbox_change_xlimits.setChecked(False)
-        layout.addWidget(self.checkbox_change_xlimits)
+        # Layout horizontal para los botones
+        button_layout = QHBoxLayout()
+
+        # Botón: Change X limits
+        self.button_xlimits = QPushButton("Change X limits")
+        self.button_xlimits.setCheckable(True)
+        self.button_xlimits.setChecked(False)
+        self.button_xlimits.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_xlimits)
+
+        # Botón: Change Y limits
+        self.button_ylimits = QPushButton("Change Y limits")
+        self.button_ylimits.setCheckable(True)
+        self.button_ylimits.setChecked(False)
+        self.button_ylimits.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_ylimits)
+
+        layout.addLayout(button_layout)
+
+        # # X limits checkbox and inputs
+        # self.checkbox_change_xlimits = QCheckBox("Change X limits")
+        # self.checkbox_change_xlimits.setFont(text.qfont_small)
+        # self.checkbox_change_xlimits.setChecked(False)
+        # layout.addWidget(self.checkbox_change_xlimits)
 
         self.sq_xmin = QLineEdit()
         self.sq_xmin.setPlaceholderText("X min")
@@ -39,11 +58,11 @@ class PlotLimitsComponent:
         self.sq_xmax.hide()
         layout.addWidget(self.sq_xmax)
 
-        # Y limits checkbox and inputs
-        self.checkbox_change_ylimits = QCheckBox("Change Y limits")
-        self.checkbox_change_ylimits.setFont(text.qfont_small)
-        self.checkbox_change_ylimits.setChecked(False)
-        layout.addWidget(self.checkbox_change_ylimits)
+        # # Y limits checkbox and inputs
+        # self.checkbox_change_ylimits = QCheckBox("Change Y limits")
+        # self.checkbox_change_ylimits.setFont(text.qfont_small)
+        # self.checkbox_change_ylimits.setChecked(False)
+        # layout.addWidget(self.checkbox_change_ylimits)
 
         self.sq_ymin = QLineEdit()
         self.sq_ymin.setPlaceholderText("Y min")
@@ -61,28 +80,48 @@ class PlotLimitsComponent:
         if self.plot_section:
             self.plot_section.update_plot_settings()
 
-    def toggle_xlimit_inputs(self, state):
-        is_visible = state == Qt.CheckState.Checked.value
-        self.sq_xmin.setVisible(is_visible)
-        self.sq_xmax.setVisible(is_visible)
+    def connect_signals(self):
+        # X limits
+        self.button_xlimits.toggled.connect(self.toggle_xlimit_inputs)
+        self.button_xlimits.toggled.connect(self.notify_change)
+        self.sq_xmin.textChanged.connect(self.notify_change)
+        self.sq_xmax.textChanged.connect(self.notify_change)
+        # Y limits
+        self.button_ylimits.toggled.connect(self.toggle_ylimit_inputs)
+        self.button_ylimits.toggled.connect(self.notify_change)
+        self.sq_ymin.textChanged.connect(self.notify_change)
+        self.sq_ymax.textChanged.connect(self.notify_change)
 
-    def toggle_ylimit_inputs(self, state):
-        is_visible = state == Qt.CheckState.Checked.value
-        self.sq_ymin.setVisible(is_visible)
-        self.sq_ymax.setVisible(is_visible)
+    def toggle_xlimit_inputs(self, checked):
+        self.sq_xmin.setVisible(checked)
+        self.sq_xmax.setVisible(checked)
+
+    def toggle_ylimit_inputs(self, checked):
+        self.sq_ymin.setVisible(checked)
+        self.sq_ymax.setVisible(checked)
+
+    # def toggle_xlimit_inputs(self, state):
+    #     is_visible = state == Qt.CheckState.Checked.value
+    #     self.sq_xmin.setVisible(is_visible)
+    #     self.sq_xmax.setVisible(is_visible)
+
+    # def toggle_ylimit_inputs(self, state):
+    #     is_visible = state == Qt.CheckState.Checked.value
+    #     self.sq_ymin.setVisible(is_visible)
+    #     self.sq_ymax.setVisible(is_visible)
 
     def get_limit_settings(self):
         """Return the current limit settings"""
         xlim = None
         ylim = None
 
-        if self.checkbox_change_xlimits.isChecked():
+        if self.button_xlimits.isChecked():
             try:
                 xlim = (float(self.sq_xmin.text()), float(self.sq_xmax.text()))
             except ValueError:
                 xlim = None
 
-        if self.checkbox_change_ylimits.isChecked():
+        if self.button_ylimits.isChecked():
             try:
                 ylim = (float(self.sq_ymin.text()), float(self.sq_ymax.text()))
             except ValueError:
@@ -90,26 +129,57 @@ class PlotLimitsComponent:
 
         return {"xlim": xlim, "ylim": ylim}
 
+    # def get_limit_settings(self):
+    #     """Return the current limit settings"""
+    #     xlim = None
+    #     ylim = None
+
+    #     if self.checkbox_change_xlimits.isChecked():
+    #         try:
+    #             xlim = (float(self.sq_xmin.text()), float(self.sq_xmax.text()))
+    #         except ValueError:
+    #             xlim = None
+
+    #     if self.checkbox_change_ylimits.isChecked():
+    #         try:
+    #             ylim = (float(self.sq_ymin.text()), float(self.sq_ymax.text()))
+    #         except ValueError:
+    #             ylim = None
+
+    #     return {"xlim": xlim, "ylim": ylim}
+
     def restore_settings(self, settings):
         if settings.get("xlim"):
-            self.checkbox_change_xlimits.setChecked(True)
+            self.button_xlimits.setChecked(True)
             xlim = settings["xlim"]
             self.sq_xmin.setText(str(xlim[0]))
             self.sq_xmax.setText(str(xlim[1]))
         if settings.get("ylim"):
-            self.checkbox_change_ylimits.setChecked(True)
+            self.button_ylimits.setChecked(True)
             ylim = settings["ylim"]
             self.sq_ymin.setText(str(ylim[0]))
             self.sq_ymax.setText(str(ylim[1]))
 
-    def connect_signals(self):
-        # X limits
-        self.checkbox_change_xlimits.stateChanged.connect(self.notify_change)
-        self.checkbox_change_xlimits.stateChanged.connect(self.toggle_xlimit_inputs)
-        self.sq_xmin.textChanged.connect(self.notify_change)
-        self.sq_xmax.textChanged.connect(self.notify_change)
-        # Y limits
-        self.checkbox_change_ylimits.stateChanged.connect(self.notify_change)
-        self.checkbox_change_ylimits.stateChanged.connect(self.toggle_ylimit_inputs)
-        self.sq_ymin.textChanged.connect(self.notify_change)
-        self.sq_ymax.textChanged.connect(self.notify_change)
+    # def restore_settings(self, settings):
+    #     if settings.get("xlim"):
+    #         self.checkbox_change_xlimits.setChecked(True)
+    #         xlim = settings["xlim"]
+    #         self.sq_xmin.setText(str(xlim[0]))
+    #         self.sq_xmax.setText(str(xlim[1]))
+    #     if settings.get("ylim"):
+    #         self.checkbox_change_ylimits.setChecked(True)
+    #         ylim = settings["ylim"]
+    #         self.sq_ymin.setText(str(ylim[0]))
+    #         self.sq_ymax.setText(str(ylim[1]))
+
+    # def connect_signals(self):
+    #     # X limits
+    #     self.checkbox_change_xlimits.stateChanged.connect(self.notify_change)
+    #     self.checkbox_change_xlimits.stateChanged.connect(self.toggle_xlimit_inputs)
+    #     self.sq_xmin.textChanged.connect(self.notify_change)
+    #     self.sq_xmax.textChanged.connect(self.notify_change)
+    #     # Y limits
+    #     self.checkbox_change_ylimits.stateChanged.connect(self.notify_change)
+    #     self.checkbox_change_ylimits.stateChanged.connect(self.toggle_ylimit_inputs)
+    #     self.sq_ymin.textChanged.connect(self.notify_change)
+    #     self.sq_ymax.textChanged.connect(self.notify_change)

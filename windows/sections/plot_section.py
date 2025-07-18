@@ -1,5 +1,6 @@
 import config.button as button
 import config.text as text
+import config.menu_style as menu_style
 import matplotlib.colors as mcolors
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
@@ -89,6 +90,7 @@ class PlotSection(QWidget):
         self.plot_option = QComboBox()
         self.plot_option.addItems(["Line", "Scatter", "Bar"])
         self.plot_option.setFont(text.qfont_small)
+        self.plot_option.setStyleSheet(menu_style.menu)
         self.plot_option.currentTextChanged.connect(self.update_plot_preview)
         layout.addWidget(self.plot_option)
 
@@ -103,6 +105,7 @@ class PlotSection(QWidget):
 
         self.color_menu = QComboBox()
         self.color_menu.setFont(text.qfont_small)
+        self.color_menu.setStyleSheet(menu_style.menu)
         # Obtener colores y nombres
         color_dict = mcolors.TABLEAU_COLORS
         for full_name in color_dict:
@@ -176,7 +179,7 @@ class PlotSection(QWidget):
             style_settings["grid"],
             style_settings["legend_text"],
             self.plot_settings["color"],  # color
-            self.regression_component.checkbox_enable_regression.isChecked(),  # enable_regression
+            self.regression_component.button_enable_regression.isChecked(),  # enable_regression
             self.regression_component.sq_regression_type.currentText()     # regression_type
         )
 

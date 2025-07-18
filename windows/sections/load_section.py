@@ -1,5 +1,6 @@
 import config.button as button
 import config.text as text
+import config.menu_style as menu_style
 import netCDF4 as nc
 import os
 import pandas as pd
@@ -8,7 +9,8 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QLabel, QPushButton, 
-    QLineEdit, QSpacerItem, QSizePolicy, QComboBox
+    QLineEdit, QSpacerItem, QSizePolicy, QComboBox,
+    QHBoxLayout
 )
 from config.colors import *
 
@@ -29,18 +31,20 @@ class LoadFileSection(QWidget):
         layout.addWidget(self.title_section)
 
         # Botón Load File
-        self.btn_load = QPushButton("Load File")
-        self.btn_load.clicked.connect(parent.select_file)
-        #self.btn_load.setFixedSize(button.nav_size[0], button.nav_size[1])
-        self.btn_load.setStyleSheet(button.load_file)
-        layout.addWidget(self.btn_load)
 
         # Campo de texto para mostrar la ruta del archivo
+        dir_layout = QHBoxLayout()
         self.file_path = QLineEdit()
         self.file_path.setPlaceholderText("Load a file")
-        #self.file_path.setFixedSize(button.nav_size[0], button.nav_size[1])
         self.file_path.setStyleSheet(button.file_input)
-        layout.addWidget(self.file_path)
+        self.file_path.setStyleSheet(menu_style.file_input_style)
+        dir_layout.addWidget(self.file_path)
+
+        self.btn_load = QPushButton("Load File")
+        self.btn_load.clicked.connect(parent.select_file)
+        self.btn_load.setStyleSheet(button.load_file)
+        dir_layout.addWidget(self.btn_load)
+        layout.addLayout(dir_layout)
 
         self.file_path.textChanged.connect(self.analyze_file_type)
 
@@ -51,6 +55,7 @@ class LoadFileSection(QWidget):
         self.header_option = QComboBox()
         self.header_option.addItems(["Has Headers", "No Headers"])
         self.header_option.setFont(text.qfont_small)
+        self.header_option.setStyleSheet(menu_style.menu)
         self.header_section.hide()
         self.header_option.hide()
         layout.addWidget(self.header_section)
@@ -75,10 +80,12 @@ class LoadFileSection(QWidget):
 
         self.combo_select1 = QComboBox()
         self.combo_select1.setFont(text.qfont_small)
+        self.combo_select1.setStyleSheet(menu_style.menu)
         self.combo_select1.hide()
 
         self.combo_select2 = QComboBox()
         self.combo_select2.setFont(text.qfont_small)
+        self.combo_select2.setStyleSheet(menu_style.menu)  
         self.combo_select2.hide()
 
         self.combo_select3 = QComboBox()

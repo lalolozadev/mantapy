@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit
+from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit, QPushButton, QHBoxLayout
 from PyQt6.QtCore import Qt
 import config.text as text
 import config.button as button
@@ -21,17 +21,24 @@ class PlotStyleComponent:
         self.style_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.style_section)
 
-        # Grid checkbox
-        self.checkbox_grid = QCheckBox("Show grid")
-        self.checkbox_grid.setChecked(False)
-        self.checkbox_grid.setFont(text.qfont_small)
-        layout.addWidget(self.checkbox_grid)
+        # Layout horizontal para los botones
+        button_layout = QHBoxLayout()
 
-        # Legend checkbox and input
-        self.checkbox_legend = QCheckBox("Show legend")
-        self.checkbox_legend.setChecked(False)
-        self.checkbox_legend.setFont(text.qfont_small)
-        layout.addWidget(self.checkbox_legend)
+        # Botón: Show grid
+        self.button_grid = QPushButton("Show grid")
+        self.button_grid.setCheckable(True)
+        self.button_grid.setChecked(False)
+        self.button_grid.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_grid)
+
+        # Botón: Show legend
+        self.button_legend = QPushButton("Show legend")
+        self.button_legend.setCheckable(True)
+        self.button_legend.setChecked(False)
+        self.button_legend.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_legend)
+
+        layout.addLayout(button_layout)
 
         self.sq_legend = QLineEdit()
         self.sq_legend.setPlaceholderText("Type legend name")
@@ -44,22 +51,29 @@ class PlotStyleComponent:
         if self.plot_section:
             self.plot_section.update_plot_settings()
 
-    def toggle_legend_input(self, state):
-        """Show/hide the legend input based on checkbox state"""
-        self.sq_legend.setVisible(state == Qt.CheckState.Checked.value)
+    def connect_signals(self):
+        """Connect all signals to notify change and toggle legend input"""
+        self.button_grid.toggled.connect(self.notify_change)
+        self.button_legend.toggled.connect(self.toggle_legend_input)
+        self.button_legend.toggled.connect(self.notify_change)
+        self.sq_legend.textChanged.connect(self.notify_change)
 
+    def toggle_legend_input(self, checked):
+        """Show/hide the legend input based on button state"""
+        self.sq_legend.setVisible(checked)
+    
     def get_style_settings(self):
         """Return the current style settings"""
         return {
-            "grid": self.checkbox_grid.isChecked(),
-            "legend": self.checkbox_legend.isChecked(),
-            "legend_text": self.sq_legend.text() if self.checkbox_legend.isChecked() else ""
+            "grid": self.button_grid.isChecked(),
+            "legend": self.button_legend.isChecked(),
+            "legend_text": self.sq_legend.text() if self.button_legend.isChecked() else ""
         }
 
     def restore_settings(self, settings):
         """Restore style settings from a dictionary"""
-        self.checkbox_grid.setChecked(settings.get("grid", False))
-        self.checkbox_legend.setChecked(settings.get("legend", False))
+        self.button_grid.setChecked(settings.get("grid", False))
+        self.button_legend.setChecked(settings.get("legend", False))
         if settings.get("legend"):
             self.sq_legend.setText(settings.get("legend_text", ""))
 
@@ -71,14 +85,3 @@ class PlotStyleComponent:
                 return current
             current = current.parent()
         return None
-    
-    def connect_signals(self):
-        """Connect all signals to notify change"""
-        self.checkbox_grid.stateChanged.connect(self.notify_change)
-        self.checkbox_legend.stateChanged.connect(self.notify_change)
-        self.sq_legend.textChanged.connect(self.notify_change)
-        
-        # Toggle visibilidad de la leyenda
-        self.checkbox_legend.stateChanged.connect(
-            lambda state: self.sq_legend.setVisible(state == Qt.CheckState.Checked.value)
-        )

@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit
+from PyQt6.QtWidgets import QLabel, QCheckBox, QLineEdit, QHBoxLayout, QPushButton
 from PyQt6.QtCore import Qt
 import config.text as text
 import config.button as button
@@ -21,11 +21,38 @@ class PlotLabelsComponent:
         self.label_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.label_section)
 
-        # Title checkbox and input
-        self.checkbox_title = QCheckBox("Show title")
-        self.checkbox_title.setChecked(False)
-        self.checkbox_title.setFont(text.qfont_small)
-        layout.addWidget(self.checkbox_title)
+        # Crear un layout horizontal para los botones toggle
+        button_layout = QHBoxLayout()
+
+        # Botón: Show title
+        self.button_title = QPushButton("Show title")
+        self.button_title.setCheckable(True)
+        self.button_title.setChecked(False)
+        self.button_title.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_title)
+
+        # Botón: Show X label
+        self.button_xlabel = QPushButton("Show X label")
+        self.button_xlabel.setCheckable(True)
+        self.button_xlabel.setChecked(False)
+        self.button_xlabel.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_xlabel)
+
+        # Botón: Show Y label
+        self.button_ylabel = QPushButton("Show Y label")
+        self.button_ylabel.setCheckable(True)
+        self.button_ylabel.setChecked(False)
+        self.button_ylabel.setFont(text.qfont_small)
+        button_layout.addWidget(self.button_ylabel)
+
+        # Agregar el layout horizontal al layout principal
+        layout.addLayout(button_layout)
+
+        # # Title checkbox and input
+        # self.checkbox_title = QCheckBox("Show title")
+        # self.checkbox_title.setChecked(False)
+        # self.checkbox_title.setFont(text.qfont_small)
+        # layout.addWidget(self.checkbox_title)
 
         self.sq_title = QLineEdit()
         self.sq_title.setPlaceholderText("Type title")
@@ -33,11 +60,11 @@ class PlotLabelsComponent:
         self.sq_title.hide()
         layout.addWidget(self.sq_title)
 
-        # X Label checkbox and input
-        self.checkbox_xlabel = QCheckBox("Show X label")
-        self.checkbox_xlabel.setFont(text.qfont_small)
-        self.checkbox_xlabel.setChecked(False)
-        layout.addWidget(self.checkbox_xlabel)
+        # # X Label checkbox and input
+        # self.checkbox_xlabel = QCheckBox("Show X label")
+        # self.checkbox_xlabel.setFont(text.qfont_small)
+        # self.checkbox_xlabel.setChecked(False)
+        # layout.addWidget(self.checkbox_xlabel)
 
         self.sq_xlabel = QLineEdit()
         self.sq_xlabel.setPlaceholderText("Type X label")
@@ -45,11 +72,11 @@ class PlotLabelsComponent:
         self.sq_xlabel.hide()
         layout.addWidget(self.sq_xlabel)
 
-        # Y Label checkbox and input
-        self.checkbox_ylabel = QCheckBox("Show Y label")
-        self.checkbox_ylabel.setFont(text.qfont_small)
-        self.checkbox_ylabel.setChecked(False)
-        layout.addWidget(self.checkbox_ylabel)
+        # # Y Label checkbox and input
+        # self.checkbox_ylabel = QCheckBox("Show Y label")
+        # self.checkbox_ylabel.setFont(text.qfont_small)
+        # self.checkbox_ylabel.setChecked(False)
+        # layout.addWidget(self.checkbox_ylabel)
 
         self.sq_ylabel = QLineEdit()
         self.sq_ylabel.setPlaceholderText("Type Y label")
@@ -65,15 +92,15 @@ class PlotLabelsComponent:
     def restore_settings(self, settings):
         """Restore label settings from a dictionary"""
         if settings.get("title"):
-            self.checkbox_title.setChecked(True)
+            self.button_title.setChecked(True)
             self.sq_title.setText(settings["title"])
         
         if settings.get("xlabel"):
-            self.checkbox_xlabel.setChecked(True)
+            self.button_xlabel.setChecked(True)
             self.sq_xlabel.setText(settings["xlabel"])
         
         if settings.get("ylabel"):
-            self.checkbox_ylabel.setChecked(True)
+            self.button_ylabel.setChecked(True)
             self.sq_ylabel.setText(settings["ylabel"])
 
     def find_plot_section(self, widget):
@@ -85,18 +112,28 @@ class PlotLabelsComponent:
             current = current.parent()
         return None
     
+    # def connect_signals(self):
+    #     """Connect all signals to notify_change and visibility toggles"""
+    #     # Connect each checkbox to its specific handler
+    #     self.checkbox_title.stateChanged.connect(lambda state: self.on_checkbox_changed(state, self.checkbox_title, self.sq_title))
+    #     self.checkbox_xlabel.stateChanged.connect(lambda state: self.on_checkbox_changed(state, self.checkbox_xlabel, self.sq_xlabel))
+    #     self.checkbox_ylabel.stateChanged.connect(lambda state: self.on_checkbox_changed(state, self.checkbox_ylabel, self.sq_ylabel))
+
     def connect_signals(self):
         """Connect all signals to notify_change and visibility toggles"""
-        # Connect each checkbox to its specific handler
-        self.checkbox_title.stateChanged.connect(lambda state: self.on_checkbox_changed(state, self.checkbox_title, self.sq_title))
-        self.checkbox_xlabel.stateChanged.connect(lambda state: self.on_checkbox_changed(state, self.checkbox_xlabel, self.sq_xlabel))
-        self.checkbox_ylabel.stateChanged.connect(lambda state: self.on_checkbox_changed(state, self.checkbox_ylabel, self.sq_ylabel))
+        # Conectar los botones toggle para mostrar/ocultar los campos de texto
+        self.button_title.toggled.connect(lambda checked: self.sq_title.setVisible(checked))
+        self.button_title.toggled.connect(self.notify_change)
+        self.button_xlabel.toggled.connect(lambda checked: self.sq_xlabel.setVisible(checked))
+        self.button_xlabel.toggled.connect(self.notify_change)
+        self.button_ylabel.toggled.connect(lambda checked: self.sq_ylabel.setVisible(checked))
+        self.button_ylabel.toggled.connect(self.notify_change)
 
         # Connect each text input to its specific handler
-        self.sq_title.textChanged.connect(lambda text: self.on_text_changed(text, self.sq_title, self.checkbox_title))
-        self.sq_xlabel.textChanged.connect(lambda text: self.on_text_changed(text, self.sq_xlabel, self.checkbox_xlabel))
-        self.sq_ylabel.textChanged.connect(lambda text: self.on_text_changed(text, self.sq_ylabel, self.checkbox_ylabel))
-
+        self.sq_title.textChanged.connect(lambda text: self.on_text_changed(text, self.sq_title, self.button_title))
+        self.sq_xlabel.textChanged.connect(lambda text: self.on_text_changed(text, self.sq_xlabel, self.button_xlabel))
+        self.sq_ylabel.textChanged.connect(lambda text: self.on_text_changed(text, self.sq_ylabel, self.button_ylabel))
+        
     def on_checkbox_changed(self, state, checkbox, text_input):
         """Handle checkbox state changes"""
         # Update visibility
@@ -110,10 +147,18 @@ class PlotLabelsComponent:
         if checkbox.isChecked():
             self.notify_change()
 
+    # def get_label_settings(self):
+    #     """Return the current label settings"""
+    #     return {
+    #         "title": self.sq_title.text() if self.checkbox_title.isChecked() else "",
+    #         "xlabel": self.sq_xlabel.text() if self.checkbox_xlabel.isChecked() else "",
+    #         "ylabel": self.sq_ylabel.text() if self.checkbox_ylabel.isChecked() else ""
+    #     }
+
     def get_label_settings(self):
         """Return the current label settings"""
         return {
-            "title": self.sq_title.text() if self.checkbox_title.isChecked() else "",
-            "xlabel": self.sq_xlabel.text() if self.checkbox_xlabel.isChecked() else "",
-            "ylabel": self.sq_ylabel.text() if self.checkbox_ylabel.isChecked() else ""
+            "title": self.sq_title.text() if self.button_title.isChecked() else "",
+            "xlabel": self.sq_xlabel.text() if self.button_xlabel.isChecked() else "",
+            "ylabel": self.sq_ylabel.text() if self.button_ylabel.isChecked() else ""
         }

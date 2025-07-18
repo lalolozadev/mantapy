@@ -77,7 +77,7 @@ next = ("QPushButton {"
     f"background-color: {verde2};"
     "}"
     "QPushButton:pressed {"
-    f"background-color: {verde1};"
+    f"background-color: {verde2};"
     "}"
 )
 

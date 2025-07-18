@@ -1,44 +1,36 @@
-from .text import text_normal
+from .text import text_small
+from .colors import *
 
-menu_style = """
-    QComboBox {"
-        padding: 5px;
-        font-size: 14px;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        background-color: #ffffff;
-    "}
+padding = 5
+border_radius = 5
 
-    QComboBox::drop-down {
-        border: none;
-    }
+menu = ("QComboBox {"
+        f"background-color: {azul3};"
+        "border: 1px solid gray;"
+        f"padding: {padding}px;"
+        f"border-radius: {border_radius}px;"
+        "color: black;"
+        f"font-size: {text_small}px;"
+    "}"
+    "QComboBox::drop-down {"
+        "border-left: 1px solid gray;"
+        #"background-color: #dcdcdc;"
+        "width: 20px;"
+    "}"
+    "QComboBox::down-arrow {"
+        "image: url(assets/down-arrow.png);"
+        "width: 10px;"
+        "height: 10px;"
+    "}"
+    )
 
-    /* Elimina esta sección si quieres la flecha del sistema:
-    QComboBox::down-arrow {
-        image: url(assets/arrow_down.png);
-        width: 12px;
-        height: 12px;
-    }
-    */
-
-    QComboBox QAbstractItemView {
-        background-color: #ffffff;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        outline: 0;
-    }
-
-    QComboBox QAbstractItemView::item {
-        padding: 6px 10px;
-    }
-
-    QComboBox QAbstractItemView::item:hover {
-        background-color: #eaeaea;
-        color: #666666;  /* texto gris al hacer hover */
-    }
-
-    QComboBox QAbstractItemView::item:selected {
-        background-color: #d0d0d0;
-        color: #666666;
-    }
-"""
+file_input_style = (
+    "QLineEdit {"
+        f"background-color: {azul3};"
+        "border: 1px solid gray;"
+        f"padding: {padding}px;"
+        f"border-radius: {border_radius}px;"
+        "color: black;"
+        f"font-size: {text_small}px;"
+    "}"
+)
