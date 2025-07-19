@@ -29,6 +29,7 @@ class PlotStyleComponent:
         self.button_grid.setCheckable(True)
         self.button_grid.setChecked(False)
         self.button_grid.setFont(text.qfont_small)
+        self.button_grid.setStyleSheet(button.plot_settings)
         button_layout.addWidget(self.button_grid)
 
         # Botón: Show legend
@@ -36,6 +37,7 @@ class PlotStyleComponent:
         self.button_legend.setCheckable(True)
         self.button_legend.setChecked(False)
         self.button_legend.setFont(text.qfont_small)
+        self.button_legend.setStyleSheet(button.plot_settings)
         button_layout.addWidget(self.button_legend)
 
         layout.addLayout(button_layout)

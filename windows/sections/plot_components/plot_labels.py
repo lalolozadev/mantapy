@@ -29,6 +29,7 @@ class PlotLabelsComponent:
         self.button_title.setCheckable(True)
         self.button_title.setChecked(False)
         self.button_title.setFont(text.qfont_small)
+        self.button_title.setStyleSheet(button.plot_settings)
         button_layout.addWidget(self.button_title)
 
         # Botón: Show X label
@@ -36,6 +37,7 @@ class PlotLabelsComponent:
         self.button_xlabel.setCheckable(True)
         self.button_xlabel.setChecked(False)
         self.button_xlabel.setFont(text.qfont_small)
+        self.button_xlabel.setStyleSheet(button.plot_settings)
         button_layout.addWidget(self.button_xlabel)
 
         # Botón: Show Y label
@@ -43,6 +45,7 @@ class PlotLabelsComponent:
         self.button_ylabel.setCheckable(True)
         self.button_ylabel.setChecked(False)
         self.button_ylabel.setFont(text.qfont_small)
+        self.button_ylabel.setStyleSheet(button.plot_settings)
         button_layout.addWidget(self.button_ylabel)
 
         # Agregar el layout horizontal al layout principal

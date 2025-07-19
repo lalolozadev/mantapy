@@ -21,17 +21,12 @@ class PlotRegressionComponent:
         self.regression_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
         layout.addWidget(self.regression_section)
 
-        # # Enable regression checkbox
-        # self.checkbox_enable_regression = QCheckBox("Enable Regression")
-        # self.checkbox_enable_regression.setFont(text.qfont_small)
-        # self.checkbox_enable_regression.setChecked(False)
-        # layout.addWidget(self.checkbox_enable_regression)
-
         # Botón toggle para activar regresión
         self.button_enable_regression = QPushButton("Enable Regression")
         self.button_enable_regression.setCheckable(True)
         self.button_enable_regression.setChecked(False)
         self.button_enable_regression.setFont(text.qfont_small)
+        self.button_enable_regression.setStyleSheet(button.plot_settings)
         layout.addWidget(self.button_enable_regression)
 
 
@@ -69,18 +64,3 @@ class PlotRegressionComponent:
             idx = self.sq_regression_type.findText(settings.get("regression_type", "linear"))
             if idx >= 0:
                 self.sq_regression_type.setCurrentIndex(idx)
-
-    # def connect_signals(self):
-    #     # Mostrar/ocultar input
-    #     self.checkbox_enable_regression.stateChanged.connect(self.toggle_regression_inputs)
-    #     # Notificar cambio de regresión
-    #     self.checkbox_enable_regression.stateChanged.connect(self.notify_change)
-    #     self.sq_regression_type.currentTextChanged.connect(self.notify_change)
-    
-    # def notify_change(self):
-    #     if self.plot_section:
-    #         self.plot_section.update_plot_preview(self.plot_section.plot_option.currentText())
-    # def toggle_regression_inputs(self):
-    #     is_checked = self.checkbox_enable_regression.isChecked()
-    #     self.sq_regression_type.setVisible(is_checked)
-    #     self.plot_section.regression_type = self.sq_regression_type.currentText()
