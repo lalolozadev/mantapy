@@ -100,6 +100,23 @@ back = ("QPushButton {"
     "}"
 )
 
+back_load = ("QPushButton {"
+    f"background-color: {azul1};"
+    "color: white;"
+    f"font-size: {text_small}px;"
+    f"border-radius: {border_radius}px;"
+    f"padding: {padding}px;"
+    "min-height: 30px;"
+    "max-height: 30px;"
+    "}"
+    "QPushButton:hover {"
+    f"background-color: {azul2};"
+    "}"
+    "QPushButton:pressed {"
+    f"background-color: {azul1};"
+    "}"
+)
+
 file_input = (
     "QLineEdit {"
     f"border: 2px solid #ccc;"

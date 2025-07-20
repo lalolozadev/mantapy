@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtWidgets import QFileDialog, QHBoxLayout
 from PyQt6.QtCore import QThread, pyqtSignal, QObject
 from config.colors import *
+import config.menu_style as menu_style
 
 class ExportPlotSection(QWidget):
     def __init__(self, parent):
@@ -22,8 +23,8 @@ class ExportPlotSection(QWidget):
 
         self.title_section = QLabel(
             f"<span style='font-size:{text.text_subtitle}px;'><b> Export Your Plot </b></span><br>"
-            f"<span style='font-size:{text.text_normal}px;'>Save your plot in various formats to share or use in reports. </span><br><br>"
-            f"<span style='font-size:{text.text_normal}px;'> Choose the format and click the button below to export. </span><br>"
+            f"<span style='font-size:{text.text_normal}px;'>Save your plot in PNG, JPEG, PDF or SVG format to share or use in reports. </span><br><br>"
+            f"<span style='font-size:{text.text_normal}px;'> Choose file name </span>"
         )
         self.title_section.setWordWrap(True)
         self.title_section.setAlignment(Qt.AlignmentFlag.AlignLeft)
@@ -32,21 +33,8 @@ class ExportPlotSection(QWidget):
         # Campo de texto para mostrar el nombre del archivo
         self.file_name = QLineEdit()
         self.file_name.setPlaceholderText("Enter file name")
-        self.file_name.setStyleSheet(button.file_input)
+        self.file_name.setStyleSheet(menu_style.file_input_style)
         layout.addWidget(self.file_name)
-
-        # Sección para seleccionar directorio
-        dir_layout = QHBoxLayout()
-        self.dir_path = QLineEdit()
-        self.dir_path.setPlaceholderText("Select directory")
-        self.dir_path.setReadOnly(True)
-        self.dir_path.setStyleSheet(button.file_input)
-        btn_browse = QPushButton("Browse")
-        btn_browse.setStyleSheet(button.export_plot)
-        btn_browse.clicked.connect(self.select_directory)
-        dir_layout.addWidget(self.dir_path)
-        dir_layout.addWidget(btn_browse)
-        layout.addLayout(dir_layout)
 
         # Menú desplegable para elegir el formato de exportación
         self.format_section = QLabel(
@@ -55,13 +43,35 @@ class ExportPlotSection(QWidget):
         self.format_option = QComboBox()
         self.format_option.addItems(["PNG", "JPEG", "PDF", "SVG"])
         self.format_option.setFont(text.qfont_small)
+        self.format_option.setStyleSheet(menu_style.menu)
         layout.addWidget(self.format_section)
         layout.addWidget(self.format_option)
+
+        self.directory_section = QLabel(
+            f"<span style='font-size:{text.text_normal}px;'> Select the directory where you want to save the plot </span>"
+        )
+        layout.addWidget(self.directory_section)
+
+        # Sección para seleccionar directorio
+        dir_layout = QHBoxLayout()
+        self.dir_path = QLineEdit()
+        self.dir_path.setPlaceholderText("Select directory")
+        self.dir_path.setReadOnly(True)
+        self.dir_path.setStyleSheet(menu_style.file_input_style)
+
+        btn_browse = QPushButton("Browse dir")
+        btn_browse.setStyleSheet(button.export_plot)
+        btn_browse.clicked.connect(self.select_directory)
+        dir_layout.addWidget(self.dir_path)
+        dir_layout.addWidget(btn_browse)
+        layout.addLayout(dir_layout)
+
+        layout.addSpacerItem(QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding))
 
         # Botón Export Plot
         self.btn_export = QPushButton("Export Plot")
         self.btn_export.clicked.connect(parent.export_plot)
-        self.btn_export.setStyleSheet(button.export_plot)
+        self.btn_export.setStyleSheet(button.next)
         layout.addWidget(self.btn_export)
 
         # Botón Back para regresar a la sección anterior
@@ -73,15 +83,9 @@ class ExportPlotSection(QWidget):
         # Boton para volver a la sección de carga
         self.btn_back = QPushButton("Back to Load Section")
         self.btn_back.clicked.connect(lambda: parent.stacked_widget.setCurrentWidget(parent.page_load))
-        self.btn_back.setStyleSheet(button.back)
+        self.btn_back.setStyleSheet(button.back_load)
         layout.addWidget(self.btn_back)
 
-        # Espaciador para ajustar el diseño
-        spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
-        layout.addItem(spacer)
-
-        # Estilo del widget
-        #self.setStyleSheet(widget_style)
     
     def select_directory(self):
         directory = QFileDialog.getExistingDirectory(self, "Select Directory")
