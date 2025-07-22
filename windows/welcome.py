@@ -7,6 +7,7 @@ import config.text as text
 import config.button as button
 import config.window as window
 from config.colors import *
+from img.paths import logo_path
 
 class WelcomeWindow(QWidget):
     def __init__(self):
@@ -40,7 +41,7 @@ class WelcomeWindow(QWidget):
         layout.addWidget(self.label_welcome)
 
         label = QLabel()
-        pixmap = QPixmap("assets/logo_mantapy.ico")
+        pixmap = QPixmap(logo_path)
         scaled_pixmap = pixmap.scaled(128, 128, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
         label.setPixmap(scaled_pixmap)
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)  # Centrar la imagen en el QLabel

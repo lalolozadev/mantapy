@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Mantapy
+Exec=/opt/mantapy/bin/mantapy
+Icon=/opt/mantapy/img/logo_mantapy.png
+Type=Application
+Categories=Utility;
+Terminal=false

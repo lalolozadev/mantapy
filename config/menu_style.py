@@ -1,5 +1,6 @@
 from .text import text_small
 from .colors import *
+from img.paths import arrow_down_path
 
 padding = 5
 border_radius = 5
@@ -18,7 +19,7 @@ menu = ("QComboBox {"
         "width: 20px;"
     "}"
     "QComboBox::down-arrow {"
-        "image: url(assets/down-arrow.png);"
+        f"image: url({arrow_down_path});"
         "width: 10px;"
         "height: 10px;"
     "}"

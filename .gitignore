@@ -1,3 +1,9 @@
 venv/
 config/__pycache__
 windows/__pycache__
+changelog
+mantapy_1.0_amd64.deb
+package_root/
+dist/
+build/
+mantapy.spec
