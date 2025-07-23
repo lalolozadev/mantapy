@@ -7,5 +7,5 @@ def resource_path(relative_path):
         return os.path.join(sys._MEIPASS, relative_path)
     return os.path.join(os.path.abspath("."), relative_path)
 
-logo_path = resource_path("img/logo_mantapy.png")
-arrow_down_path = resource_path("img/down-arrow.png")
+logo_path = resource_path("assets/logo_mantapy.png")
+arrow_down_path = resource_path("assets/down-arrow.png")

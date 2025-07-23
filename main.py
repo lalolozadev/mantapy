@@ -3,7 +3,7 @@ from PyQt6.QtGui import QIcon, QFont
 from windows.welcome import WelcomeWindow
 import sys
 from config.text import text_small
-from img.paths import logo_path
+from assets.paths import logo_path
 
 
 # Run the program
