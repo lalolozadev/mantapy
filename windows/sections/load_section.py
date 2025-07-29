@@ -115,6 +115,8 @@ class LoadFileSection(QWidget):
         self.file_handlers = {
             '.csv': self.handle_csv_txt,
             '.txt': self.handle_csv_txt,
+            '.xls': self.handle_csv_txt,    # <-- Añade esta línea
+            '.xlsx': self.handle_csv_txt,   # <-- Y esta línea
             '.nc': self.handle_netcdf,
             '.netcdf': self.handle_netcdf
         }
