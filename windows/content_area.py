@@ -204,8 +204,17 @@ class ContentSection(QFrame):
         self.label.hide()
 
         # Eliminar el archivo temporal después de cargarlo
-        QTimer.singleShot(5000, lambda: os.remove(self.temp_file.name) if os.path.exists(self.temp_file.name) else None)
+        def safe_remove_temp_file():
+            if os.path.exists(self.temp_file.name):
+                try:
+                    os.remove(self.temp_file.name)
+                    print("Archivo temporal eliminado correctamente.")
+                except PermissionError:
+                    print("Archivo aún en uso. Reintentando en 1 segundo...")
+                    QTimer.singleShot(1000, safe_remove_temp_file)
 
+        QTimer.singleShot(1000, safe_remove_temp_file)
+        self.temp_file.close()
     #--------------------------------------------
 
     def update_plot_settings(

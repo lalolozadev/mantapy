@@ -7,3 +7,5 @@ package_root/
 dist/
 build/
 mantapy.spec
+Output/
+main.spec
