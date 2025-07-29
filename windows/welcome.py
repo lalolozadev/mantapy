@@ -7,7 +7,7 @@ import config.text as text
 import config.button as button
 import config.window as window
 from config.colors import *
-from assets.paths import logo_path
+from paths import logo_path
 
 class WelcomeWindow(QWidget):
     def __init__(self):

@@ -1,6 +1,6 @@
 from .text import text_small
 from .colors import *
-from assets.paths import arrow_down_path
+from paths import arrow_down_path
 
 padding = 5
 border_radius = 5
